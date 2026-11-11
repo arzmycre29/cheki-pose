@@ -5,8 +5,6 @@ import { sfx } from "./audio.js";
 class ChekiPoseApp {
   constructor() {
     this.currentMode = "cute";
-    this.sopFilter = "all";
-    this.visualMode = "photo";
     this.selectedPose = null;
     this.isRolling = false;
     this.wakeLock = null;
@@ -19,13 +17,12 @@ class ChekiPoseApp {
   init() {
     this.syncSoundButton();
     this.bindEvents();
-    this.preloadModeImages(this.currentMode);
+    this.preloadAllImages();
 
-    const initialPoses = this.getFilteredPoses();
+    const initialPoses = this.getPosesByMode(this.currentMode);
     if (initialPoses.length > 0) {
       this.displayPose(initialPoses[0], false);
     }
-    this.renderContactSheet();
   }
 
   getPosesByMode(mode = this.currentMode) {
@@ -33,15 +30,8 @@ class ChekiPoseApp {
     return CHEKI_POSES.filter((p) => p.mode === mode);
   }
 
-  getFilteredPoses() {
-    const modePoses = this.getPosesByMode(this.currentMode);
-    if (this.sopFilter === "all") return modePoses;
-    return modePoses.filter((p) => p.sop === this.sopFilter);
-  }
-
-  preloadModeImages(mode) {
-    const poses = this.getPosesByMode(mode);
-    poses.forEach((pose) => {
+  preloadAllImages() {
+    CHEKI_POSES.forEach((pose) => {
       if (pose.image && !this.imageCache.has(pose.image)) {
         const img = new Image();
         img.src = pose.image;
@@ -50,13 +40,12 @@ class ChekiPoseApp {
     });
   }
 
-  // Fisher-Yates shuffle keeps gacha rolls fair and prevents back-to-back duplicates.
   drawFromDeck() {
-    const pool = this.getFilteredPoses();
+    const pool = this.getPosesByMode(this.currentMode);
     if (pool.length === 0) return null;
     if (pool.length === 1) return pool[0];
 
-    const deckKey = `${this.currentMode}:${this.sopFilter}`;
+    const deckKey = this.currentMode;
     let deck = this.decks[deckKey];
 
     if (!deck || deck.length === 0) {
@@ -75,144 +64,114 @@ class ChekiPoseApp {
   }
 
   switchMode(modeKey) {
-    if (this.currentMode === modeKey) return;
+    if (this.currentMode === modeKey || this.isRolling) return;
     this.currentMode = modeKey;
-    sfx.playPop();
+    sfx.playTick(450);
 
     document.documentElement.dataset.mode = modeKey;
     document.body.dataset.mode = modeKey;
 
-    document.querySelectorAll(".mode-tab").forEach((btn) => {
+    document.querySelectorAll(".mode-chip").forEach((btn) => {
       const isActive = btn.dataset.mode === modeKey;
       btn.classList.toggle("active", isActive);
       btn.setAttribute("aria-pressed", String(isActive));
     });
 
-    this.preloadModeImages(modeKey);
-
-    let filtered = this.getFilteredPoses();
-    if (filtered.length === 0 && this.sopFilter !== "all") {
-      this.setSopFilter("all", false);
-      filtered = this.getFilteredPoses();
-    }
-
-    this.renderContactSheet();
-
-    const nextPick = this.drawFromDeck() || filtered[0];
-    if (nextPick) {
-      this.triggerShutterTransition(nextPick);
+    const modePoses = this.getPosesByMode(modeKey);
+    if (modePoses.length > 0) {
+      const pick = this.drawFromDeck() || modePoses[0];
+      this.displayPose(pick, false);
     }
   }
 
-  setSopFilter(sopValue, shouldRender = true) {
-    this.sopFilter = sopValue;
-    document.querySelectorAll(".sop-filter-btn").forEach((btn) => {
-      const isActive = btn.dataset.sop === sopValue;
-      btn.classList.toggle("active", isActive);
-      btn.setAttribute("aria-pressed", String(isActive));
-    });
-    if (shouldRender) {
-      sfx.playPop();
-      this.renderContactSheet();
-    }
-  }
-
-  stepPose(direction) {
-    const pool = this.getFilteredPoses();
-    const activePool = pool.length > 0 ? pool : this.getPosesByMode(this.currentMode);
-    if (activePool.length === 0) return;
-
-    const currentIndex = this.selectedPose
-      ? activePool.findIndex((p) => p.id === this.selectedPose.id)
-      : 0;
-    const nextIndex = (currentIndex + direction + activePool.length) % activePool.length;
-    const targetPose = activePool[nextIndex];
-
-    sfx.playPop();
-    this.displayPose(targetPose, true);
-    if (this.isFullscreenOpen()) {
-      this.populateFullscreen(targetPose);
-    }
-  }
-
-  rollGacha() {
+  rollRoulette() {
     if (this.isRolling) return;
-    let pool = this.getFilteredPoses();
-    if (pool.length === 0) {
-      this.setSopFilter("all", true);
-      pool = this.getFilteredPoses();
-    }
+    const pool = this.getPosesByMode(this.currentMode);
     if (pool.length === 0) return;
 
     const finalPick = this.drawFromDeck() || pool[0];
-    this.triggerShutterTransition(finalPick);
-  }
-
-  triggerShutterTransition(targetPose) {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     if (reducedMotion) {
-      sfx.playFanfare();
-      this.displayPose(targetPose, false);
+      sfx.playLock();
+      this.displayPose(finalPick, true);
       return;
     }
 
     this.isRolling = true;
     const btnRoll = document.getElementById("btn-roll-gacha");
-    const curtain = document.getElementById("shutter-curtain");
-    const filmCodeEl = document.getElementById("film-code");
+    const card = document.getElementById("polaroid-card");
+    const flashEl = document.getElementById("flash-overlay");
 
     if (btnRoll) btnRoll.disabled = true;
-    if (curtain) curtain.classList.add("snap-closed");
-    sfx.playSpin();
+    if (card) card.classList.add("is-spinning");
 
-    const pool = this.getPosesByMode(this.currentMode);
-    let ticks = 0;
-    const ticker = setInterval(() => {
-      ticks++;
-      if (filmCodeEl && pool.length > 0) {
-        const sample = pool[ticks % pool.length];
-        filmCodeEl.textContent = `SHUTTER // ${sample.code} · ROLLING`;
-      }
-      sfx.playSpin();
-      if (ticks >= 4) {
-        clearInterval(ticker);
-        this.displayPose(targetPose, true);
-        sfx.playFanfare();
+    // Deceleration schedule across ~2.6 seconds (16 steps with gradually expanding intervals)
+    const delays = [55, 55, 60, 65, 70, 80, 95, 115, 140, 175, 220, 275, 340, 420, 510];
+    let stepIndex = 0;
+    let lastCandidateId = this.selectedPose ? this.selectedPose.id : null;
 
-        setTimeout(() => {
-          if (curtain) curtain.classList.remove("snap-closed");
-          this.isRolling = false;
-          if (btnRoll) btnRoll.disabled = false;
-        }, 90);
+    const executeStep = () => {
+      if (stepIndex < delays.length) {
+        // High-speed reel and gradual deceleration phase
+        let candidate = pool[Math.floor(Math.random() * pool.length)];
+        if (pool.length > 1 && candidate.id === lastCandidateId) {
+          candidate = pool.find((p) => p.id !== lastCandidateId) || candidate;
+        }
+        lastCandidateId = candidate.id;
+
+        this.renderVisual(candidate, document.getElementById("photo-render-area"));
+        const titleEl = document.getElementById("pose-title");
+        const titleJpEl = document.getElementById("pose-title-jp");
+        if (titleEl) titleEl.textContent = candidate.title;
+        if (titleJpEl) titleJpEl.textContent = candidate.titleJp || "";
+
+        // Pitch slides slightly lower as wheel slows down
+        const pitch = 560 - stepIndex * 15;
+        sfx.playTick(pitch);
+
+        const currentDelay = delays[stepIndex];
+        stepIndex++;
+        setTimeout(executeStep, currentDelay);
+      } else {
+        // Final jackpot lock
+        if (card) card.classList.remove("is-spinning");
+        this.displayPose(finalPick, true);
+        sfx.playLock();
+
+        if (flashEl) {
+          flashEl.classList.add("active");
+          setTimeout(() => flashEl.classList.remove("active"), 280);
+        }
+
+        if (card) {
+          card.classList.add("lock-celebrate");
+          setTimeout(() => card.classList.remove("lock-celebrate"), 450);
+        }
+
+        this.isRolling = false;
+        if (btnRoll) btnRoll.disabled = false;
       }
-    }, 55);
+    };
+
+    executeStep();
   }
 
-  displayPose(pose, animateDevelop = false) {
+  displayPose(pose, isFinalLock = false) {
     this.selectedPose = pose;
-    const modePoses = this.getPosesByMode(this.currentMode);
-    const indexInMode = modePoses.findIndex((p) => p.id === pose.id);
-    const ordinal = indexInMode >= 0 ? String(indexInMode + 1).padStart(2, "0") : "01";
-    const total = String(modePoses.length).padStart(2, "0");
     const modeMeta = MODE_INFO[pose.mode] || MODE_INFO.cute;
 
-    const filmCodeEl = document.getElementById("film-code");
-    if (filmCodeEl) {
-      filmCodeEl.textContent = `EXP ${ordinal} / ${total} · ${pose.mode.toUpperCase()}`;
+    const modeBadge = document.getElementById("mode-badge-label");
+    if (modeBadge) {
+      modeBadge.textContent = `${modeMeta.name} (${modeMeta.jpName})`;
     }
 
-    const sopBadge = document.getElementById("pose-sop-badge");
+    const sopBadge = document.getElementById("sop-badge-label");
     if (sopBadge) {
       const isSafe = pose.sop === "safe";
-      sopBadge.textContent = isSafe ? "SOP: AMAN (TANPA SENTUH)" : "SOP: POSE DEKAT";
-      sopBadge.className = `sop-stamp ${isSafe ? "sop-safe" : "sop-close"}`;
+      sopBadge.textContent = isSafe ? "SOP: Aman (Tanpa Sentuh)" : "SOP: Pose Dekat";
+      sopBadge.className = `badge-sop ${isSafe ? "sop-safe" : "sop-close"}`;
     }
-
-    const serialEl = document.getElementById("deck-serial-code");
-    if (serialEl) serialEl.textContent = `SEIRIKEN // ${pose.code}`;
-
-    const modeTagEl = document.getElementById("deck-mode-tag");
-    if (modeTagEl) modeTagEl.textContent = `${modeMeta.name} (${modeMeta.jpName})`;
 
     const titleEl = document.getElementById("pose-title");
     if (titleEl) titleEl.textContent = pose.title;
@@ -226,9 +185,6 @@ class ChekiPoseApp {
     const descEl = document.getElementById("pose-description");
     if (descEl) descEl.textContent = pose.description || "";
 
-    const captionJpEl = document.getElementById("film-caption-jp");
-    if (captionJpEl) captionJpEl.textContent = pose.titleJp || pose.title;
-
     const cueIdEl = document.getElementById("pose-cue-id");
     const cueJpEl = document.getElementById("pose-cue-jp");
     if (cueIdEl) cueIdEl.textContent = `"${pose.cueId}"`;
@@ -241,160 +197,50 @@ class ChekiPoseApp {
 
     const renderArea = document.getElementById("photo-render-area");
     if (renderArea) {
-      this.renderVisual(pose, renderArea, "pose-img", animateDevelop);
+      this.renderVisual(pose, renderArea);
     }
 
-    this.highlightActiveSheetItem();
+    if (this.isFullscreenOpen()) {
+      this.populateFullscreen(pose);
+    }
   }
 
-  renderVisual(pose, targetElement, imgClass = "pose-img", animateDevelop = false) {
-    const loadingEl = document.getElementById("photo-loading");
-    const fallbackNotice = document.getElementById("VisualFallbackNotice");
-    const dimEl = document.getElementById("film-dimensions");
-    const isMainStage = targetElement.id === "photo-render-area";
+  renderVisual(pose, targetElement) {
+    if (!targetElement) return;
 
-    if (this.visualMode === "diagram" || !pose.image) {
-      if (isMainStage && loadingEl) loadingEl.hidden = true;
-      if (isMainStage && fallbackNotice) fallbackNotice.hidden = false;
-      if (isMainStage && dimEl) dimEl.textContent = "VEKTOR // SKEMA POSISI";
+    if (!pose.image) {
       targetElement.innerHTML = renderPoseDiagram(pose.diagramType, pose.mode);
       return;
     }
 
-    if (isMainStage && loadingEl) loadingEl.hidden = false;
-    if (isMainStage && fallbackNotice) fallbackNotice.hidden = true;
+    const cached = this.imageCache.get(pose.image);
+    targetElement.innerHTML = "";
 
-    const img = new Image();
-    img.className = animateDevelop ? `${imgClass} developing` : imgClass;
-    img.alt = `${pose.title} (${pose.titleJp})`;
-    img.decoding = "async";
+    const ambient = new Image();
+    ambient.src = pose.image;
+    ambient.className = "viewfinder-ambient";
+    ambient.alt = "";
+    ambient.setAttribute("aria-hidden", "true");
+    targetElement.appendChild(ambient);
 
-    img.onload = () => {
-      if (isMainStage && loadingEl) loadingEl.hidden = true;
-      targetElement.innerHTML = "";
-
-      if (isMainStage) {
-        const ambient = new Image();
-        ambient.src = pose.image;
-        ambient.className = "viewfinder-ambient";
-        ambient.alt = "";
-        ambient.setAttribute("aria-hidden", "true");
-        targetElement.appendChild(ambient);
-
-        if (dimEl && img.naturalWidth && img.naturalHeight) {
-          dimEl.textContent = `${img.naturalWidth}×${img.naturalHeight} · 100% UTUH`;
-        }
-      }
-
+    if (cached && cached.complete && cached.naturalWidth > 0) {
+      const img = cached.cloneNode();
+      img.className = "pose-img";
+      img.alt = `${pose.title} (${pose.titleJp || ""})`;
       targetElement.appendChild(img);
-
-      if (animateDevelop) {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            img.classList.remove("developing");
-          });
-        });
-      }
-    };
-
-    img.onerror = () => {
-      if (isMainStage && loadingEl) loadingEl.hidden = true;
-      if (isMainStage && fallbackNotice) {
-        fallbackNotice.textContent = "Foto tidak ditemukan, menampilkan skema posisi vektor.";
-        fallbackNotice.hidden = false;
-      }
-      if (isMainStage && dimEl) dimEl.textContent = "FALLBACK // SKEMA SVG";
-      targetElement.innerHTML = renderPoseDiagram(pose.diagramType, pose.mode);
-    };
-
-    img.src = pose.image;
-  }
-
-  toggleVisualMode() {
-    this.visualMode = this.visualMode === "photo" ? "diagram" : "photo";
-    sfx.playPop();
-
-    const labelEl = document.getElementById("visual-mode-label");
-    if (labelEl) {
-      labelEl.textContent =
-        this.visualMode === "photo" ? "Tampilan: Foto Asli" : "Tampilan: Skema SVG";
+    } else {
+      const img = new Image();
+      img.className = "pose-img";
+      img.alt = `${pose.title} (${pose.titleJp || ""})`;
+      img.onload = () => {
+        this.imageCache.set(pose.image, img);
+      };
+      img.onerror = () => {
+        targetElement.innerHTML = renderPoseDiagram(pose.diagramType, pose.mode);
+      };
+      img.src = pose.image;
+      targetElement.appendChild(img);
     }
-
-    if (this.selectedPose) {
-      const renderArea = document.getElementById("photo-render-area");
-      if (renderArea) {
-        this.renderVisual(this.selectedPose, renderArea, "pose-img", false);
-      }
-      if (this.isFullscreenOpen()) {
-        this.populateFullscreen(this.selectedPose);
-      }
-    }
-  }
-
-  renderContactSheet() {
-    const grid = document.getElementById("contact-sheet-grid");
-    const emptyState = document.getElementById("contact-sheet-empty");
-    if (!grid) return;
-
-    const poses = this.getFilteredPoses();
-    grid.innerHTML = "";
-
-    if (poses.length === 0) {
-      if (emptyState) emptyState.hidden = false;
-      return;
-    }
-
-    if (emptyState) emptyState.hidden = true;
-
-    poses.forEach((pose) => {
-      const card = document.createElement("button");
-      card.type = "button";
-      card.className = `sheet-item${this.selectedPose && this.selectedPose.id === pose.id ? " active" : ""}`;
-      card.dataset.poseId = pose.id;
-      card.setAttribute("role", "listitem");
-
-      const isSafe = pose.sop === "safe";
-      const sopLabel = isSafe ? "AMAN" : "DEKAT";
-      const sopClass = isSafe ? "sop-safe" : "sop-close";
-
-      card.innerHTML = `
-        <div class="sheet-item-top">
-          <span class="sheet-exp-code">${pose.code}</span>
-          <span class="sheet-sop-dot ${sopClass}">${sopLabel}</span>
-        </div>
-        <div class="sheet-thumb-gate">
-          <img src="${pose.image}" alt="${pose.title}" class="sheet-thumb-img" loading="lazy" decoding="async">
-        </div>
-        <div class="sheet-item-title">${pose.title}</div>
-        <div class="sheet-item-jp" lang="ja">${pose.titleJp}</div>
-      `;
-
-      const thumbImg = card.querySelector(".sheet-thumb-img");
-      if (thumbImg) {
-        thumbImg.addEventListener("error", () => {
-          const gate = card.querySelector(".sheet-thumb-gate");
-          if (gate) gate.innerHTML = renderPoseDiagram(pose.diagramType, pose.mode);
-        });
-      }
-
-      card.addEventListener("click", () => {
-        sfx.playPop();
-        this.displayPose(pose, true);
-        if (window.innerWidth < 1024) {
-          const stage = document.getElementById("main-stage");
-          if (stage) stage.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      });
-
-      grid.appendChild(card);
-    });
-  }
-
-  highlightActiveSheetItem() {
-    if (!this.selectedPose) return;
-    document.querySelectorAll(".sheet-item").forEach((item) => {
-      item.classList.toggle("active", item.dataset.poseId === this.selectedPose.id);
-    });
   }
 
   isFullscreenOpen() {
@@ -403,14 +249,10 @@ class ChekiPoseApp {
   }
 
   populateFullscreen(pose) {
-    const serialTag = document.getElementById("fs-serial-tag");
-    if (serialTag) {
-      serialTag.textContent = `${pose.code} // TUNJUKKAN KE OSHI`;
-    }
-
-    const sopTag = document.getElementById("fs-sop-tag");
-    if (sopTag) {
-      sopTag.textContent = pose.sop === "safe" ? "SOP: AMAN" : "SOP: DEKAT";
+    const modeTag = document.getElementById("fs-mode-tag");
+    const modeMeta = MODE_INFO[pose.mode] || MODE_INFO.cute;
+    if (modeTag) {
+      modeTag.textContent = `${modeMeta.name} // TUNJUKKAN KE OSHI`;
     }
 
     document.getElementById("fs-title").textContent = pose.title;
@@ -422,13 +264,22 @@ class ChekiPoseApp {
 
     const fsVisual = document.getElementById("fs-visual");
     if (fsVisual) {
-      this.renderVisual(pose, fsVisual, "fs-img", false);
+      fsVisual.innerHTML = "";
+      if (pose.image) {
+        const img = new Image();
+        img.className = "fs-img";
+        img.alt = pose.title;
+        img.src = pose.image;
+        fsVisual.appendChild(img);
+      } else {
+        fsVisual.innerHTML = renderPoseDiagram(pose.diagramType, pose.mode);
+      }
     }
   }
 
   openShowToIdol() {
     if (!this.selectedPose) return;
-    sfx.playPop();
+    sfx.playTick(520);
 
     const modal = document.getElementById("modal-show-idol");
     if (!modal) return;
@@ -450,17 +301,18 @@ class ChekiPoseApp {
     this.releaseWakeLock();
   }
 
-  async copyText(text, buttonEl, defaultLabel) {
-    if (!text || !buttonEl) return;
+  async copyCue() {
+    if (!this.selectedPose) return;
+    const btn = document.getElementById("btn-copy-cue");
+    const text = this.selectedPose.cueId;
     let copied = false;
+
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(text);
         copied = true;
       }
-    } catch (err) {
-      copied = false;
-    }
+    } catch (e) {}
 
     if (!copied) {
       try {
@@ -476,18 +328,18 @@ class ChekiPoseApp {
         temp.setSelectionRange(0, temp.value.length);
         copied = document.execCommand("copy");
         document.body.removeChild(temp);
-      } catch (e) {
-        copied = false;
-      }
+      } catch (e) {}
     }
 
-    sfx.playPop();
-    buttonEl.textContent = copied ? "Tersalin" : "Gagal Salin";
-    buttonEl.classList.add("copied");
-    setTimeout(() => {
-      buttonEl.textContent = defaultLabel;
-      buttonEl.classList.remove("copied");
-    }, 1800);
+    sfx.playTick(600);
+    if (btn) {
+      btn.textContent = copied ? "Tersalin!" : "Gagal";
+      btn.classList.add("copied");
+      setTimeout(() => {
+        btn.textContent = "Salin Teks";
+        btn.classList.remove("copied");
+      }, 1600);
+    }
   }
 
   syncSoundButton() {
@@ -521,28 +373,15 @@ class ChekiPoseApp {
   }
 
   bindEvents() {
-    document.querySelectorAll(".mode-tab").forEach((btn) => {
+    document.querySelectorAll(".mode-chip").forEach((btn) => {
       btn.addEventListener("click", () => {
         this.switchMode(btn.dataset.mode);
       });
     });
 
-    document.querySelectorAll(".sop-filter-btn").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        this.setSopFilter(btn.dataset.sop, true);
-      });
-    });
-
-    const btnResetFilter = document.getElementById("btn-reset-filter");
-    if (btnResetFilter) {
-      btnResetFilter.addEventListener("click", () => {
-        this.setSopFilter("all", true);
-      });
-    }
-
     const btnRoll = document.getElementById("btn-roll-gacha");
     if (btnRoll) {
-      btnRoll.addEventListener("click", () => this.rollGacha());
+      btnRoll.addEventListener("click", () => this.rollRoulette());
       btnRoll.addEventListener("pointermove", (e) => {
         const rect = btnRoll.getBoundingClientRect();
         const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
@@ -552,34 +391,11 @@ class ChekiPoseApp {
       });
     }
 
-    const btnPrev = document.getElementById("btn-prev-pose");
-    if (btnPrev) {
-      btnPrev.addEventListener("click", () => this.stepPose(-1));
-    }
-
-    const btnNext = document.getElementById("btn-next-pose");
-    if (btnNext) {
-      btnNext.addEventListener("click", () => this.stepPose(1));
-    }
-
-    const btnFsPrev = document.getElementById("btn-fs-prev");
-    if (btnFsPrev) {
-      btnFsPrev.addEventListener("click", () => this.stepPose(-1));
-    }
-
-    const btnFsNext = document.getElementById("btn-fs-next");
-    if (btnFsNext) {
-      btnFsNext.addEventListener("click", () => this.stepPose(1));
-    }
-
-    const photoTrigger = document.getElementById("photo-frame-trigger");
-    if (photoTrigger) {
-      photoTrigger.addEventListener("click", (e) => {
-        if (e.target.closest("#btn-toggle-visual")) return;
-        this.openShowToIdol();
-      });
-      photoTrigger.addEventListener("keydown", (e) => {
-        if (e.target !== photoTrigger) return;
+    const photoBox = document.getElementById("viewfinder-box");
+    if (photoBox) {
+      photoBox.addEventListener("click", () => this.openShowToIdol());
+      photoBox.addEventListener("keydown", (e) => {
+        if (e.target !== photoBox) return;
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           this.openShowToIdol();
@@ -587,25 +403,17 @@ class ChekiPoseApp {
       });
     }
 
-    const btnToggleVisual = document.getElementById("btn-toggle-visual");
-    if (btnToggleVisual) {
-      btnToggleVisual.addEventListener("click", (e) => {
-        e.stopPropagation();
-        this.toggleVisualMode();
-      });
-    }
-
-    const btnFsBadge = document.getElementById("btn-fullscreen-badge");
-    if (btnFsBadge) {
-      btnFsBadge.addEventListener("click", (e) => {
+    const btnFsPill = document.getElementById("btn-fullscreen-trigger");
+    if (btnFsPill) {
+      btnFsPill.addEventListener("click", (e) => {
         e.stopPropagation();
         this.openShowToIdol();
       });
     }
 
-    const btnOpenBoard = document.getElementById("btn-open-board");
-    if (btnOpenBoard) {
-      btnOpenBoard.addEventListener("click", () => this.openShowToIdol());
+    const btnShowBottom = document.getElementById("btn-show-oshi-bottom");
+    if (btnShowBottom) {
+      btnShowBottom.addEventListener("click", () => this.openShowToIdol());
     }
 
     const btnCloseFs = document.getElementById("btn-close-fullscreen");
@@ -613,20 +421,9 @@ class ChekiPoseApp {
       btnCloseFs.addEventListener("click", () => this.closeShowToIdol());
     }
 
-    const btnCopyId = document.getElementById("btn-copy-cue");
-    if (btnCopyId) {
-      btnCopyId.addEventListener("click", () => {
-        if (!this.selectedPose) return;
-        this.copyText(this.selectedPose.cueId, btnCopyId, "Salin ID");
-      });
-    }
-
-    const btnCopyJp = document.getElementById("btn-copy-jp");
-    if (btnCopyJp) {
-      btnCopyJp.addEventListener("click", () => {
-        if (!this.selectedPose) return;
-        this.copyText(this.selectedPose.cueJp, btnCopyJp, "Salin JP");
-      });
+    const btnCopy = document.getElementById("btn-copy-cue");
+    if (btnCopy) {
+      btnCopy.addEventListener("click", () => this.copyCue());
     }
 
     const btnSound = document.getElementById("btn-toggle-sound");
@@ -646,15 +443,9 @@ class ChekiPoseApp {
         return;
       }
 
-      if (e.key === "ArrowLeft") {
+      if ((e.key === " " || e.key.toLowerCase() === "r") && e.target === document.body) {
         e.preventDefault();
-        this.stepPose(-1);
-      } else if (e.key === "ArrowRight") {
-        e.preventDefault();
-        this.stepPose(1);
-      } else if ((e.key === " " || e.key.toLowerCase() === "r") && e.target === document.body) {
-        e.preventDefault();
-        this.rollGacha();
+        this.rollRoulette();
       } else if (e.key.toLowerCase() === "f" && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         if (this.isFullscreenOpen()) {
