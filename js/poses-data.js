@@ -302,6 +302,118 @@ export const CHEKI_POSES = [
     cueId: "Kak, ceritanya aku ketahuan melirik member lain lalu minta ampun, kamu tutup telinga ya!",
     cueJp: "浮気がバレて謝るファンと、耳を塞ぐ推しメンで！",
     description: "Drama komedi khas fans dan oshi yang selalu berhasil mencairkan suasana bilik cheki."
+  },
+  {
+    id: "cute-08-back-to-back-arch",
+    code: "EXP-20",
+    title: "Sandar Punggung Segitiga (Shoujo Arch)",
+    titleJp: "背中合わせアーチ立ち",
+    romaji: "Senaka-awase Arch",
+    mode: "cute",
+    sop: "close",
+    image: "assets/poses/cute/pose_20_443956475749893231.jpg",
+    diagramType: "back-to-back",
+    fanAction: "Berdiri saling membelakangi oshi, sandarkan punggung membentuk sudut lengkung segitiga sambil tangan di saku.",
+    idolAction: "Berdiri membelakangi fans sambil menolehkan kepala ke kamera dengan senyum manis.",
+    cueId: "Kak, pose sandar punggung saling menopang ala cover komik shoujo yuk!",
+    cueJp: "少女漫画の表紙みたいに、背中合わせで少しもたれかかるポーズしましょう！",
+    description: "Siluet segitiga estetik ala poster film romansa remaja Jepang yang dramatis dan fotogenik."
+  },
+  {
+    id: "cute-09-peeking-eyes",
+    code: "EXP-21",
+    title: "Intip Mata dari Bawah Frame (Peekaboo)",
+    titleJp: "下からひょっこり目線",
+    romaji: "Shita kara Hyokkori",
+    mode: "cute",
+    sop: "safe",
+    image: "assets/poses/cute/pose_21_783204191487536601.jpg",
+    diagramType: "chin-flower",
+    fanAction: "Berjongkok rendah di bawah kamera bersama oshi, hanya memunculkan dahi dan mata ke dalam frame.",
+    idolAction: "Ikut berjongkok di samping fans, menatap lensa kamera dengan tatapan mata bulat menggemaskan.",
+    cueId: "Kak, kita berdua sembunyi di bawah kamera, yang kelihatan cuma mata dan poni kita ya!",
+    cueJp: "フレームの下から目と前髪だけひょっこり出して撮りましょう！",
+    description: "Komposisi negatif space lapang di atas kepala dengan dua pasang mata mengintip dari bawah secara menggemaskan."
+  },
+  {
+    id: "fun-05-sentai-hero-stance",
+    code: "EXP-22",
+    title: "Pasukan Sentai Kantoran (Office Hero)",
+    titleJp: "戦隊ヒーロー出勤キメポーズ",
+    romaji: "Sentai Hero Shukkou",
+    mode: "fun",
+    sop: "safe",
+    image: "assets/poses/fun/pose_22_635781672440844159.jpg",
+    diagramType: "kamehameha",
+    fanAction: "Buka kaki kuda-kuda lebar ke samping, tangan satu di panggul, tangan lain pasang peace horizontal di samping mata.",
+    idolAction: "Buka kuda-kuda ke arah berlawanan membentuk formasi simetris, pasang tatapan tajam pahlawan pembela kebenaran.",
+    cueId: "Kak, pasang kuda-kuda pahlawan sentai yuk! Peace miring di samping mata!",
+    cueJp: "戦隊ヒーロー参上！目の横ピースでバシッとキメポーズしましょう！",
+    description: "Pose aksi skuad pahlawan tokusatsu berkuda-kuda lebar penuh percaya diri dan karisma panggung."
+  },
+  {
+    id: "fun-06-mutual-worship",
+    code: "EXP-23",
+    title: "Sujud Sembah Dua Arah (Mutual Praise)",
+    titleJp: "お互いひれ伏し拝み合い",
+    romaji: "Hagami-ai Begging",
+    mode: "fun",
+    sop: "safe",
+    image: "assets/poses/fun/pose_23_636696466107567212.jpg",
+    diagramType: "crying-fan",
+    fanAction: "Berlutut di hadapan oshi sambil mengangkat kedua telapak tangan memuji ke atas layaknya menyembah ratu.",
+    idolAction: "Berlutut berhadapan dengan fans sambil menangkupkan tangan memohon dengan ekspresi terharu.",
+    cueId: "Kak, kita sama-sama berlutut saling menyembah dan mengagumi satu sama lain ya!",
+    cueJp: "お互いひざまずいて、両手を合わせて拝み合いましょう！",
+    description: "Interaksi jenaka di mana fans memuja oshi setinggi langit dan oshi merespons dengan rasa terima kasih setara."
+  },
+  {
+    id: "meme-09-sassy-model",
+    code: "EXP-24",
+    title: "Pose Model Centil (Sassy Runway Stance)",
+    titleJp: "サッシーモデル・腰くね立ち",
+    romaji: "Sassy Model Dachi",
+    mode: "meme",
+    sop: "safe",
+    image: "assets/poses/meme/pose_24_742460688567030059.jpg",
+    diagramType: "gyaru-peace",
+    fanAction: "Tekuk pinggang ke samping secara berlebihan, tangan menopang pinggul, leher miring memasang tatapan percaya diri.",
+    idolAction: "Satu tangan di belakang kepala, lutut sedikit ditekuk menyamping dengan pose model majalah mode eksentrik.",
+    cueId: "Kak, yuk pose model runway yang centil dan lentur badannya!",
+    cueJp: "ハイテンションな海外モデル風に、腰をキュッと曲げてキメましょう！",
+    description: "Gaya jalan model busana kelas atas yang diperagakan secara hiperbolis dan mengundang tawa."
+  },
+  {
+    id: "meme-10-rival-finger-gun",
+    code: "EXP-25",
+    title: "Duo Rival Anime (Rival Finger Guns)",
+    titleJp: "赤青ライバル・真顔の指銃",
+    romaji: "Akao Rival Yubi-juu",
+    mode: "meme",
+    sop: "safe",
+    image: "assets/poses/meme/pose_25_990369774802304326.jpg",
+    diagramType: "spiderman",
+    fanAction: "Jongkok satu lutut membelakangi oshi, bidikkan pistol dua jari lurus ke langit dengan wajah super serius.",
+    idolAction: "Jongkok membelakangi fans ke arah berlawanan, satu tangan menopang siku pistol jari mengarah ke atas.",
+    cueId: "Kak, kita jadi duo rival anime legendaris, pasang pistol jari ke atas dengan muka datar dingin!",
+    cueJp: "アニメの赤青ライバルみたいに、背中合わせで真顔で上を狙う指銃ポーズで！",
+    description: "Parodi duet rival protagonis anime aksi era 2000-an dengan intensitas dramatis yang kontras menggelikan."
+  },
+  {
+    id: "meme-11-curiga-doakes",
+    code: "EXP-26",
+    title: "Tatapan Curiga Doakes (Suspicious Side-Eye)",
+    titleJp: "疑惑のガン見・ドークス刑事ミーム",
+    romaji: "Doakes Gun-mi Meme",
+    mode: "meme",
+    sop: "close",
+    image: "assets/poses/meme/pose_26_977633031630608574.jpg",
+    diagramType: "chin-flower",
+    fanAction: "Dekatkan wajah dari samping, memicingkan mata tajam menginterogasi ke arah wajah oshi tanpa berkedip.",
+    idolAction: "Menoleh sedikit dengan ekspresi tenang pura-pura tidak bersalah menghadapi tatapan menyelidik.",
+    cueId: "Kak, pasang tatapan curiga sedekat mungkin kayak meme detektif yang lagi menginterogasi!",
+    cueJp: "海外ドラマのミームみたいに、横から疑いの目でガン見してください！",
+    description: "Adaptasi meme legendaris James Doakes yang mengawasi targetnya dengan kecurigaan tingkat tinggi."
   }
 ];
 
@@ -310,28 +422,28 @@ export const MODE_INFO = {
     key: "all",
     name: "Semua Pose",
     jpName: "全フレーム",
-    code: "ALL-19",
-    description: "Seluruh 19 lembar kontak referensi pose dari semua kategori."
+    code: "ALL-26",
+    description: "Seluruh 26 lembar kontak referensi pose dari semua kategori."
   },
   cute: {
     key: "cute",
     name: "Cute Mode",
     jpName: "キュート",
-    code: "CUTE-07",
+    code: "CUTE-09",
     description: "Pose manis, dekat, dan fotogenik untuk cheki berdua."
   },
   fun: {
     key: "fun",
     name: "Fun Mode",
     jpName: "ユニーク",
-    code: "FUN-04",
+    code: "FUN-06",
     description: "Pose aksi, sudut kamera ekstrem, dan duet kompak."
   },
   meme: {
     key: "meme",
     name: "Random Meme",
     jpName: "カオス",
-    code: "MEME-08",
+    code: "MEME-11",
     description: "Pose komedi dari meme internet dan parodi ikonik."
   }
 };

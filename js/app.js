@@ -16,6 +16,7 @@ class ChekiPoseApp {
 
   init() {
     this.syncSoundButton();
+    this.updateChipCounts();
     this.bindEvents();
     this.preloadAllImages();
 
@@ -23,6 +24,22 @@ class ChekiPoseApp {
     if (initialPoses.length > 0) {
       this.displayPose(initialPoses[0], false);
     }
+  }
+
+  updateChipCounts() {
+    const counts = {
+      all: CHEKI_POSES.length,
+      cute: CHEKI_POSES.filter((p) => p.mode === "cute").length,
+      fun: CHEKI_POSES.filter((p) => p.mode === "fun").length,
+      meme: CHEKI_POSES.filter((p) => p.mode === "meme").length,
+    };
+    document.querySelectorAll(".mode-chip").forEach((btn) => {
+      const mode = btn.dataset.mode;
+      const countEl = btn.querySelector(".mode-chip-num");
+      if (countEl && counts[mode] !== undefined) {
+        countEl.textContent = String(counts[mode]).padStart(2, "0");
+      }
+    });
   }
 
   getPosesByMode(mode = this.currentMode) {
