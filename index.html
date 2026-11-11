@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>ChekiPose - Webapp Penentu Pose Cheki Chika Idol</title>
+  <meta name="description" content="Aplikasi pembantu dan penentu pose cheki (2-shot polaroid) untuk event idol dan chika idol. Dilengkapi Gacha Roulette, Katalog Cute, Fun & Meme, serta Mode Tunjukkan ke Oshi.">
+  <meta name="theme-color" content="#FF6584">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-mode="cute">
+
+  <!-- ========================================== -->
+  <!-- APP HEADER                                 -->
+  <!-- ========================================== -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">📷</div>
+        <div class="brand-text">
+          <h1 class="brand-title">ChekiPose <span class="brand-jp">チェキ</span></h1>
+          <p class="brand-subtitle">Chika Idol Pose Helper</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btn-toggle-sound" class="btn-icon" title="Nyalakan/Matikan Suara">🔔</button>
+      </div>
+    </div>
+
+    <!-- Mode Switcher Pill Bar (Cute, Fun, Meme, All) -->
+    <div class="mode-bar-container">
+      <div class="mode-bar" role="tablist">
+        <button class="mode-pill active" data-mode="cute" title="Pose Manis & Kawaii">
+          <span class="mode-emoji">🎀</span> Cute Mode
+        </button>
+        <button class="mode-pill" data-mode="fun" title="Pose Interaktif & Seru">
+          <span class="mode-emoji">✨</span> Fun Mode
+        </button>
+        <button class="mode-pill" data-mode="meme" title="Pose Kocak & Meme Wota">
+          <span class="mode-emoji">🎭</span> Random Meme
+        </button>
+        <button class="mode-pill" data-mode="all" title="Campur Semua Mode">
+          <span class="mode-emoji">🎲</span> Semua
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================== -->
+  <!-- MAIN CONTAINER WITH TABS                   -->
+  <!-- ========================================== -->
+  <main class="app-main">
+
+    <!-- ---------------------------------------- -->
+    <!-- TAB 1: GACHA ROULETTE VIEW              -->
+    <!-- ---------------------------------------- -->
+    <section id="view-gacha" class="view-container active">
+      <div class="gacha-hero">
+        <div class="gacha-header-info">
+          <h2 class="view-title">🎲 Gacha Pose Acak</h2>
+          <p class="view-desc">Bingung mau pose apa di depan oshi? Putar gacha untuk tentukan pose terbaikmu dalam 3 detik!</p>
+        </div>
+
+        <!-- Polaroid Style Gacha Card -->
+        <div class="gacha-card-wrapper">
+          <div class="gacha-polaroid-frame" id="gacha-card">
+            <div id="gacha-result-content" class="gacha-result-inner">
+              <!-- Dynamically populated by app.js -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Big Spin Button & Quick Controls -->
+        <div class="gacha-controls">
+          <button id="btn-roll-gacha" class="btn btn-gacha-spin">
+            <span class="btn-gacha-icon">🎲</span>
+            <span class="btn-gacha-text">ROLL POSE BARU!</span>
+          </button>
+          
+          <div class="gacha-action-row">
+            <button id="btn-gacha-show-idol" class="btn btn-action-card btn-show-idol">
+              📱 Tunjukkan ke Oshi
+            </button>
+            <button id="btn-gacha-add-ticket" class="btn btn-action-card btn-ticket">
+              🎫 + Simpan ke Tiket
+            </button>
+            <button id="btn-gacha-studio" class="btn btn-action-card btn-studio">
+              📸 Buat Instax
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------------------------------------- -->
+    <!-- TAB 2: KATALOG POSE VIEW                -->
+    <!-- ---------------------------------------- -->
+    <section id="view-katalog" class="view-container">
+      <div class="katalog-header">
+        <h2 class="view-title">📚 Katalog Pose Cheki</h2>
+        <p class="view-desc">Jelajahi 45+ pose terpopuler lengkap dengan panduan tangan, diagram posisi, dan petunjuk bicara ke idol.</p>
+
+        <!-- Search Bar -->
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="katalog-search" placeholder="Cari nama pose, gaya tangan, atau kata kunci..." autocomplete="off">
+        </div>
+
+        <!-- SOP Filter Chips & Add Custom -->
+        <div class="filter-row">
+          <div class="sop-chips">
+            <button class="sop-chip active" data-sop="all">Semua SOP</button>
+            <button class="sop-chip" data-sop="safe">🟢 No Touch (Aman)</button>
+            <button class="sop-chip" data-sop="close">🟡 Jarak Dekat</button>
+            <button class="sop-chip" data-sop="prop">🎒 Pakai Prop</button>
+          </div>
+          <button id="btn-open-custom-pose" class="btn-custom-add" title="Buat Pose Kustom">
+            ➕ Pose Baru
+          </button>
+        </div>
+
+        <div class="katalog-meta">
+          <span id="katalog-count">Memuat katalog...</span>
+        </div>
+      </div>
+
+      <!-- Pose Grid -->
+      <div id="katalog-grid" class="pose-grid">
+        <!-- Dynamically rendered -->
+      </div>
+    </section>
+
+    <!-- ---------------------------------------- -->
+    <!-- TAB 3: TIKET & WISHLIST HARI INI        -->
+    <!-- ---------------------------------------- -->
+    <section id="view-wishlist" class="view-container">
+      <div class="wishlist-header">
+        <h2 class="view-title">🎫 Rencana Tiket Cheki</h2>
+        <p class="view-desc">Daftar antrean pose per tiket untuk sesi cheki hari ini. Centang tiket yang sudah selesai!</p>
+        
+        <div id="wishlist-summary" class="wishlist-summary-bar">
+          <!-- Dynamically populated summary pills -->
+        </div>
+      </div>
+
+      <div id="tickets-list" class="tickets-container">
+        <!-- Dynamically populated tickets -->
+      </div>
+    </section>
+
+    <!-- ---------------------------------------- -->
+    <!-- TAB 4: INSTAX STUDIO PREVIEW            -->
+    <!-- ---------------------------------------- -->
+    <section id="view-studio" class="view-container">
+      <div class="studio-header">
+        <h2 class="view-title">📸 Instax Mini Studio</h2>
+        <p class="view-desc">Simulasikan frame foto polaroid asli dengan tulisan spidol nama oshi, tanggal event, dan unduh gambarnya!</p>
+      </div>
+
+      <div class="studio-layout">
+        <!-- Canvas Preview Area -->
+        <div class="studio-preview-col">
+          <div class="polaroid-wrapper">
+            <canvas id="polaroid-canvas"></canvas>
+          </div>
+          <button id="btn-download-polaroid" class="btn btn-download-polaroid">
+            📥 Unduh Foto Instax (.png)
+          </button>
+        </div>
+
+        <!-- Controls Form -->
+        <div class="studio-controls-col">
+          <div class="card form-card">
+            <h3 class="form-title">✏️ Kustomisasi Frame Instax</h3>
+
+            <div class="form-group">
+              <label for="studio-select-pose">Pilih Pose:</label>
+              <select id="studio-select-pose" class="form-control"></select>
+            </div>
+
+            <div class="form-group">
+              <label for="studio-oshi-name">Nama Oshi (Tulisan Spidol):</label>
+              <input type="text" id="studio-oshi-name" class="form-control" placeholder="Contoh: Yuu-chan, Freya, Zee" maxlength="25">
+            </div>
+
+            <div class="form-group">
+              <label for="studio-date">Tanggal Event:</label>
+              <input type="date" id="studio-date" class="form-control">
+            </div>
+
+            <div class="form-group">
+              <label for="studio-note">Pesan Singkat di Bawah Frame:</label>
+              <input type="text" id="studio-note" class="form-control" placeholder="Contoh: Tiket #1 💖 Live House Shinjuku" maxlength="40">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- BOTTOM STICKY NAVIGATION BAR               -->
+  <!-- ========================================== -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="gacha">
+      <span class="nav-icon">🎲</span>
+      <span class="nav-label">Gacha</span>
+    </button>
+    <button class="nav-item" data-tab="katalog">
+      <span class="nav-icon">📖</span>
+      <span class="nav-label">Katalog</span>
+    </button>
+    <button class="nav-item" data-tab="wishlist">
+      <span class="nav-icon">🎫</span>
+      <span class="nav-label">Tiket</span>
+      <span id="nav-wishlist-badge" class="nav-badge" style="display:none;">0</span>
+    </button>
+    <button class="nav-item" data-tab="studio">
+      <span class="nav-icon">📸</span>
+      <span class="nav-label">Instax</span>
+    </button>
+  </nav>
+
+  <!-- ========================================== -->
+  <!-- MODAL: SHOW TO IDOL (FULLSCREEN MODE)      -->
+  <!-- ========================================== -->
+  <div id="modal-show-idol" class="modal-fullscreen">
+    <div class="show-idol-header">
+      <div class="show-idol-tag">📱 TUNJUKKAN KE OSHI (SHOW TO IDOL)</div>
+      <button id="btn-close-show-idol" class="btn-close-fullscreen">✕ Tutup</button>
+    </div>
+
+    <div class="show-idol-body">
+      <div class="show-idol-titles">
+        <h2 id="show-idol-title" class="show-title">Half Heart</h2>
+        <p id="show-idol-title-jp" class="show-title-jp">片ハート</p>
+      </div>
+
+      <div id="show-idol-visual" class="show-visual-box">
+        <!-- SVG diagram / photo -->
+      </div>
+
+      <div class="show-cue-card">
+        <p class="show-cue-intro">👉 Kak, pose ini ya:</p>
+        <h3 id="show-idol-cue-id" class="show-cue-text">"Kak, bikin setengah hati ya!"</h3>
+        <p id="show-idol-cue-jp" class="show-cue-jp">一緒にハート作ってください！</p>
+      </div>
+
+      <div class="show-actions-guide">
+        <div class="show-role-item fan">
+          <span class="show-role-pill">👤 Tangan Kamu</span>
+          <p id="show-idol-fan-action">Bentuk setengah hati di tangan kiri</p>
+        </div>
+        <div class="show-role-item idol">
+          <span class="show-role-pill">💖 Tangan Oshi</span>
+          <p id="show-idol-idol-action">Melengkapi setengah hati lainnya</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: POSE DETAIL & PHOTO UPLOAD          -->
+  <!-- ========================================== -->
+  <div id="modal-pose-detail" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="detail-title" class="modal-title">Detail Pose</h3>
+        <button class="btn-modal-close">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <p id="detail-title-jp" class="detail-jp"></p>
+
+        <div id="detail-visual" class="detail-visual-box">
+          <!-- Visual -->
+        </div>
+
+        <p id="detail-desc" class="detail-description"></p>
+
+        <div class="cue-box">
+          <span class="cue-label">🗣️ Panduan Bicara ke Oshi:</span>
+          <p id="detail-cue-id" class="cue-id"></p>
+          <p id="detail-cue-jp" class="cue-jp"></p>
+        </div>
+
+        <div class="action-roles">
+          <div class="role-col fan-role">
+            <span class="role-tag">👤 Aksi Kamu (Fan)</span>
+            <p id="detail-fan-act"></p>
+          </div>
+          <div class="role-col idol-role">
+            <span class="role-tag">💖 Aksi Oshi (Idol)</span>
+            <p id="detail-idol-act"></p>
+          </div>
+        </div>
+
+        <!-- Custom Photo Upload Section -->
+        <div class="custom-photo-section">
+          <h4>🖼️ Foto Referensi Pribadi</h4>
+          <p class="section-hint">Punya foto cheki contoh dari internet atau koleksi sendiri? Unggah ke sini untuk menggantikan diagram.</p>
+          <label class="btn btn-secondary btn-upload-wrap">
+            📁 Pilih Foto dari HP
+            <input type="file" id="input-custom-photo" accept="image/*" style="display:none;">
+          </label>
+        </div>
+
+        <!-- External Search Shortcut -->
+        <div class="twitter-inspo-section">
+          <a id="link-twitter-inspo" href="#" target="_blank" rel="noopener noreferrer" class="link-twitter">
+            🐦 Cari Contoh Foto Asli di Twitter/X (#チェキポーズ) ↗
+          </a>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-detail-show-idol" class="btn btn-primary">📱 Tunjukkan ke Oshi</button>
+        <button id="btn-detail-add-ticket" class="btn btn-secondary">🎫 + Tiket</button>
+        <button id="btn-detail-polaroid" class="btn btn-secondary">📸 Instax</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: ASSIGN TO TICKET                    -->
+  <!-- ========================================== -->
+  <div id="modal-assign-ticket" class="modal-backdrop">
+    <div class="modal-card modal-sm">
+      <div class="modal-header">
+        <h3 class="modal-title">🎫 Tambah ke Rencana Tiket</h3>
+        <button class="btn-modal-close">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="assign-subtitle">Pose yang dipilih: <strong id="assign-pose-name">Half Heart</strong></p>
+
+        <div class="form-group">
+          <label for="assign-oshi-name">Nama Oshi:</label>
+          <input type="text" id="assign-oshi-name" class="form-control" placeholder="Contoh: Yuu-chan, Zee">
+        </div>
+
+        <div class="form-group">
+          <label for="assign-notes">Catatan Tambahan (Opsional):</label>
+          <input type="text" id="assign-notes" class="form-control" placeholder="Contoh: Jangan lupa ucapin selamat ultah!">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="btn-confirm-assign" class="btn btn-primary">Simpan Tiket</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: ADD CUSTOM POSE                     -->
+  <!-- ========================================== -->
+  <div id="modal-custom-pose" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">➕ Buat Pose Kustom Sendiri</h3>
+        <button class="btn-modal-close">✕</button>
+      </div>
+      <form id="form-add-custom-pose">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="custom-title">Nama Pose:*</label>
+            <input type="text" id="custom-title" class="form-control" required placeholder="Contoh: Pose Telepati Ultraman">
+          </div>
+
+          <div class="form-group">
+            <label for="custom-mode">Kategori Mode:*</label>
+            <select id="custom-mode" class="form-control">
+              <option value="cute">🎀 Cute Mode (Manis & Romantis)</option>
+              <option value="fun">✨ Fun Mode (Unik & Interaktif)</option>
+              <option value="meme">🎭 Random Meme (Kocak & Chaos)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="custom-cue-id">Cara Ngomong ke Oshi (Bahasa Indonesia):*</label>
+            <input type="text" id="custom-cue-id" class="form-control" required placeholder="Contoh: Kak, yuk pose jurus rahasia!">
+          </div>
+
+          <div class="form-group">
+            <label for="custom-cue-jp">Petunjuk Jepang (Opsional):</label>
+            <input type="text" id="custom-cue-jp" class="form-control" placeholder="Contoh: 一緒に必殺技ポーズ！">
+          </div>
+
+          <div class="form-group">
+            <label for="custom-fan-act">Gerakan Tangan Kamu (Fan):*</label>
+            <input type="text" id="custom-fan-act" class="form-control" required placeholder="Contoh: Tangan kanan silang di dada">
+          </div>
+
+          <div class="form-group">
+            <label for="custom-idol-act">Gerakan Tangan Oshi (Idol):*</label>
+            <input type="text" id="custom-idol-act" class="form-control" required placeholder="Contoh: Tangan kiri membentuk jurus">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Simpan Pose Kustom</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

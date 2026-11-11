@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF758C"/>
+      <stop offset="100%" stop-color="#FF5D8F"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="rgba(0,0,0,0.2)"/>
+    </filter>
+  </defs>
+  <!-- Background rounded squircle -->
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  
+  <!-- Polaroid Film Shape -->
+  <g filter="url(#shadow)">
+    <rect x="96" y="86" width="320" height="340" rx="20" fill="#FAF8F5"/>
+    <!-- Photo Area -->
+    <rect x="126" y="116" width="260" height="230" rx="10" fill="#FFF0F3"/>
+    
+    <!-- Heart Symbol Inside Photo -->
+    <path d="M 256 180 C 256 160 230 145 210 160 C 180 185 256 245 256 245 C 256 245 332 185 302 160 C 282 145 256 160 256 180 Z" fill="#FF4081"/>
+    
+    <!-- Camera Lens / Sparkles -->
+    <circle cx="160" cy="150" r="14" fill="#FF758C" opacity="0.6"/>
+    <circle cx="352" cy="150" r="14" fill="#FF758C" opacity="0.6"/>
+    
+    <!-- Bottom Polaroid Text -->
+    <rect x="136" y="370" width="130" height="18" rx="9" fill="#E2E8F0"/>
+    <rect x="286" y="370" width="90" height="18" rx="9" fill="#F472B6"/>
+  </g>
+</svg>
