@@ -1,147 +1,306 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-mode="cute">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>ChekiPose - Penentu Pose Cheki Idol (Pure Gacha)</title>
-  <meta name="description" content="Aplikasi Pure Gacha untuk menentukan pose cheki bersama idol favoritmu dalam sekejap.">
-  <meta name="theme-color" content="#FF6584">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ChekiPose: Katalog &amp; Penentu Pose Cheki Idol (チェキポーズ)</title>
+  <meta name="description" content="Katalog lembar kontak 19 pose foto cheki 2-shot bersama idol dengan panduan kalimat izin bahasa Indonesia dan Jepang.">
+  <meta name="theme-color" content="#F4F1EA">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon.svg">
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&amp;family=Mochiy+Pop+One&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=Syne:wght@700;800&amp;display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body data-mode="cute">
+  <a class="skip-link" href="#main-stage">Langsung ke area penentu pose</a>
 
-  <div class="app-container">
-    <!-- ========================================== -->
-    <!-- COMPACT HEADER                             -->
-    <!-- ========================================== -->
-    <header class="app-header">
-      <div class="brand">
-        <span class="brand-icon">📷</span>
-        <div class="brand-title-wrap">
-          <h1 class="brand-title">ChekiPose <span class="brand-badge">チェキ</span></h1>
-          <p class="brand-sub">Idol Pose Gacha</p>
+  <div class="page-shell">
+    <header class="topbar" role="banner">
+      <div class="brand-block">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+            <circle cx="12" cy="11" r="3.5"></circle>
+            <line x1="7" y1="17" x2="17" y2="17"></line>
+          </svg>
+        </div>
+        <div class="brand-copy">
+          <div class="brand-title-line">
+            <h1 class="brand-title">ChekiPose</h1>
+            <span class="brand-jp" lang="ja">チェキ現像室</span>
+          </div>
+          <p class="brand-meta">INSTAX 2-SHOT CONTACT SHEET // 19 EXPOSURES</p>
         </div>
       </div>
-      <button id="btn-toggle-sound" class="btn-sound" title="Nyalakan/Matikan Suara">🔔</button>
+
+      <div class="topbar-actions">
+        <a href="#contact-sheet" class="btn-utility draw-link">
+          <span>Lembar Kontak (19)</span>
+        </a>
+        <button id="btn-toggle-sound" type="button" class="btn-utility btn-sound" aria-pressed="false" title="Aktifkan atau matikan efek suara rana kamera">
+          <svg id="icon-sound-off" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+          <svg id="icon-sound-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden>
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
+          <span id="sound-label">Suara: Mati</span>
+        </button>
+      </div>
     </header>
 
-    <!-- ========================================== -->
-    <!-- MODE SELECTOR PILLS                        -->
-    <!-- ========================================== -->
-    <nav class="mode-nav" aria-label="Pilih Mode Gacha">
-      <button class="mode-pill active" data-mode="cute">
-        <span class="mode-emoji">🎀</span> Cute Mode
+    <nav class="mode-bar" aria-label="Kategori Mode Pose">
+      <button type="button" class="mode-tab" data-mode="all" aria-pressed="false">
+        <span class="mode-tab-name">Semua Pose</span>
+        <span class="mode-tab-count">19</span>
       </button>
-      <button class="mode-pill" data-mode="fun">
-        <span class="mode-emoji">✨</span> Fun Mode
+      <button type="button" class="mode-tab active" data-mode="cute" aria-pressed="true">
+        <span class="mode-tab-name">Cute Mode</span>
+        <span class="mode-tab-count">07</span>
       </button>
-      <button class="mode-pill" data-mode="meme">
-        <span class="mode-emoji">🎭</span> Random Meme
+      <button type="button" class="mode-tab" data-mode="fun" aria-pressed="false">
+        <span class="mode-tab-name">Fun Mode</span>
+        <span class="mode-tab-count">04</span>
+      </button>
+      <button type="button" class="mode-tab" data-mode="meme" aria-pressed="false">
+        <span class="mode-tab-name">Random Meme</span>
+        <span class="mode-tab-count">08</span>
       </button>
     </nav>
 
-    <!-- ========================================== -->
-    <!-- MAIN PURE GACHA CARD (PORTRAIT 3:4)        -->
-    <!-- ========================================== -->
-    <main class="gacha-main">
-      <div class="polaroid-card" id="polaroid-card">
-        
-        <!-- 3:4 Portrait Photo Frame -->
-        <div class="photo-frame-34" id="photo-frame-trigger" title="Ketuk untuk perbesar (Show to Oshi)">
-          <div id="photo-render-area" class="photo-render-area">
-            <!-- Dynamically populated photo or SVG -->
-          </div>
-          <button id="btn-fullscreen-badge" class="badge-fullscreen" title="Layar Penuh (Show to Oshi)">
-            📱 Fullscreen
-          </button>
-        </div>
-
-        <!-- Pose Information & Details -->
-        <div class="card-info">
-          <div class="title-row">
-            <h2 id="pose-title" class="pose-title">Half Heart</h2>
-            <span id="pose-title-jp" class="pose-title-jp">片ハート</span>
+    <main id="main-stage" class="studio-stage">
+      <section class="film-column" aria-label="Cetakan Referensi Foto Instax">
+        <article class="instax-sheet" id="polaroid-card">
+          <div class="film-edge-top">
+            <span id="film-code" class="film-mono">EXP 01 / 07 · CUTE</span>
+            <span id="pose-sop-badge" class="sop-stamp sop-safe">SOP: AMAN (TANPA SENTUH)</span>
           </div>
 
-          <!-- Cue Box (Cara Ngomong ke Oshi) -->
-          <div class="cue-container">
+          <div class="viewfinder-gate" id="photo-frame-trigger" role="button" tabindex="0" aria-label="Buka tampilan layar penuh untuk ditunjukkan ke Oshi">
+            <div id="shutter-curtain" class="shutter-curtain" aria-hidden="true"></div>
+
+            <div id="photo-loading" class="photo-state-msg" hidden>
+              <span>Memuat frame eksposur...</span>
+            </div>
+
+            <div id="photo-render-area" class="photo-render-area"></div>
+
+            <div class="viewfinder-hud">
+              <button type="button" id="btn-toggle-visual" class="hud-btn" title="Ganti antara Foto Asli dan Skema Posisi Vektor">
+                <span id="visual-mode-label">Tampilan: Foto Asli</span>
+              </button>
+              <button type="button" id="btn-fullscreen-badge" class="hud-btn hud-btn-expand" title="Perbesar ke layar penuh (Tunjukkan ke Oshi)">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <polyline points="9 21 3 21 3 15"></polyline>
+                  <line x1="21" y1="3" x2="14" y2="10"></line>
+                  <line x1="3" y1="21" x2="10" y2="14"></line>
+                </svg>
+                <span>Layar Penuh</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="instax-caption-strip">
+            <div class="instax-caption-main">
+              <span id="film-caption-jp" class="instax-jp" lang="ja">頭のせピースうさ耳</span>
+              <span id="film-dimensions" class="film-mono">768×1024 · UTUH</span>
+            </div>
+            <p id="VisualFallbackNotice" class="fallback-notice" hidden>Menampilkan skema posisi vektor.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="deck-column" aria-label="Detail Instruksi Pose dan Kontrol Gacha">
+        <div class="seiriken-card">
+          <div class="seiriken-header">
+            <div class="seiriken-serial">
+              <span id="deck-serial-code" class="film-mono">SEIRIKEN // EXP-01</span>
+              <span id="deck-mode-tag" class="deck-mode-label">Cute Mode (キュート)</span>
+            </div>
+            <h2 id="pose-title" class="pose-display-title">Dagu di Kepala &amp; Kuping Kelinci</h2>
+            <p class="pose-jp-line">
+              <span id="pose-title-jp" lang="ja">頭のせピースうさ耳</span>
+              <span id="pose-romaji" class="pose-romaji">(Atama-nose Usagi)</span>
+            </p>
+            <p id="pose-description" class="pose-description">
+              Komposisi vertikal yang menonjolkan perbedaan tinggi badan antara fans dan oshi.
+            </p>
+          </div>
+
+          <div class="ticket-perforation" aria-hidden="true"></div>
+
+          <div class="cue-ticket">
             <div class="cue-head">
-              <span class="cue-label">🗣️ Cara Ngomong ke Oshi:</span>
-              <button id="btn-copy-cue" class="btn-copy">📋 Salin</button>
+              <span class="cue-heading">Kalimat Izin ke Oshi (Cue Dialog)</span>
+              <div class="cue-actions">
+                <button type="button" id="btn-copy-cue" class="btn-copy-chip">Salin ID</button>
+                <button type="button" id="btn-copy-jp" class="btn-copy-chip">Salin JP</button>
+              </div>
             </div>
-            <p id="pose-cue-id" class="cue-text">"Kak, bikin setengah hati ya! Nanti aku yang lengkapin."</p>
-            <p id="pose-cue-jp" class="cue-sub">一緒に片ハート作ってください！</p>
+            <blockquote id="pose-cue-id" class="cue-quote-id">
+              "Kak, aku numpang taruh dagu di atas kepala kamu ya, sambil pasang kuping kelinci!"
+            </blockquote>
+            <p id="pose-cue-jp" class="cue-quote-jp" lang="ja">
+              頭にあご乗せてうさ耳ポーズさせてください！
+            </p>
           </div>
 
-          <!-- Stance Guide (Fan vs Idol) -->
-          <div class="stance-guide">
-            <div class="stance-item fan">
-              <span class="stance-pill">👤 Kamu</span>
-              <p id="pose-fan-action">Bentuk setengah hati di samping</p>
+          <div class="stance-grid" aria-label="Pembagian Posisi Tubuh">
+            <div class="stance-box stance-fan">
+              <div class="stance-box-head">
+                <span class="stance-role-tag">POSISI KAMU (FAN)</span>
+              </div>
+              <p id="pose-fan-action" class="stance-text">
+                Berdiri di belakang, dagu menumpu di atas kepala oshi sambil pasang 2 jari peace di atas telinganya.
+              </p>
             </div>
-            <div class="stance-item idol">
-              <span class="stance-pill">💖 Oshi</span>
-              <p id="pose-idol-action">Melengkapi setengah hati lainnya</p>
+            <div class="stance-box stance-idol">
+              <div class="stance-box-head">
+                <span class="stance-role-tag">POSISI OSHI (IDOL)</span>
+              </div>
+              <p id="pose-idol-action" class="stance-text">
+                Duduk atau berdiri di depan, melirik ke atas sambil melipat tangan manis.
+              </p>
             </div>
+          </div>
+
+          <div class="action-console">
+            <div class="gacha-nav-row">
+              <button type="button" id="btn-prev-pose" class="btn-step" title="Pose Sebelumnya (Panah Kiri)" aria-label="Pose Sebelumnya">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+                <span>Sblm</span>
+              </button>
+
+              <button type="button" id="btn-roll-gacha" class="btn-shutter" data-fill>
+                <span class="btn-shutter-fill" aria-hidden="true"></span>
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.4" fill="currentColor"></circle>
+                  <circle cx="15.5" cy="8.5" r="1.4" fill="currentColor"></circle>
+                  <circle cx="12" cy="12" r="1.4" fill="currentColor"></circle>
+                  <circle cx="8.5" cy="15.5" r="1.4" fill="currentColor"></circle>
+                  <circle cx="15.5" cy="15.5" r="1.4" fill="currentColor"></circle>
+                </svg>
+                <span class="roll-label">
+                  <span>Acak Pose Baru</span>
+                  <span aria-hidden="true">Acak Pose Baru</span>
+                </span>
+              </button>
+
+              <button type="button" id="btn-next-pose" class="btn-step" title="Pose Berikutnya (Panah Kanan)" aria-label="Pose Berikutnya">
+                <span>Brkt</span>
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+
+            <button type="button" id="btn-open-board" class="btn-board-trigger">
+              <span>Tunjukkan Layar Penuh ke Oshi</span>
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </button>
           </div>
         </div>
-
-      </div>
+      </section>
     </main>
 
-    <!-- ========================================== -->
-    <!-- BIG TACTILE ROLL BUTTON                    -->
-    <!-- ========================================== -->
-    <footer class="app-footer">
-      <button id="btn-roll-gacha" class="btn-roll-gacha">
-        <span class="roll-icon">🎲</span>
-        <span class="roll-text">ROLL POSE BARU!</span>
-      </button>
+    <section id="contact-sheet" class="contact-sheet-section" aria-label="Lembar Kontak 19 Pose">
+      <div class="contact-sheet-header">
+        <div>
+          <p class="film-mono">ARCHIVE // CONTACT SHEET (ベタ焼き)</p>
+          <h2 class="section-heading">Daftar Lengkap 19 Frame Pose</h2>
+        </div>
+
+        <div class="sheet-controls">
+          <div class="sop-filter-group" role="group" aria-label="Filter berdasarkan jarak SOP">
+            <button type="button" class="sop-filter-btn active" data-sop="all" aria-pressed="true">Semua Jarak</button>
+            <button type="button" class="sop-filter-btn" data-sop="safe" aria-pressed="false">Aman Tanpa Sentuh</button>
+            <button type="button" class="sop-filter-btn" data-sop="close" aria-pressed="false">Pose Dekat</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="contact-sheet-empty" class="sheet-empty-state" hidden>
+        <p>Tidak ada pose pada kategori ini yang cocok dengan filter jarak tersebut.</p>
+        <button type="button" id="btn-reset-filter" class="btn-utility">Tampilkan Semua Jarak</button>
+      </div>
+
+      <div id="contact-sheet-grid" class="contact-sheet-grid" role="list"></div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="footer-meta">
+        <span class="film-mono">CHEKIPOSE // TOKUTENKAI REFERENCE SYSTEM</span>
+        <span class="footer-keys">Pintasan Keyboard: [Spasi] Acak Pose · [←/→] Navigasi · [F] Layar Penuh</span>
+      </div>
     </footer>
   </div>
 
-  <!-- ========================================== -->
-  <!-- MODAL: SHOW TO IDOL (FULLSCREEN CONTRAST)  -->
-  <!-- ========================================== -->
-  <div id="modal-show-idol" class="modal-fullscreen">
+  <div id="modal-show-idol" class="modal-fullscreen" role="dialog" aria-modal="true" aria-labelledby="fs-title" hidden>
     <div class="fullscreen-topbar">
-      <span class="fullscreen-tag">📱 TUNJUKKAN KE OSHI</span>
-      <button id="btn-close-fullscreen" class="btn-close-fullscreen">✕ Tutup</button>
+      <div class="fs-meta-group">
+        <span id="fs-serial-tag" class="fullscreen-tag">BOOTH SIGNBOARD // TUNJUKKAN KE OSHI</span>
+        <span id="fs-sop-tag" class="fs-sop-pill">SOP: AMAN</span>
+      </div>
+      <button type="button" id="btn-close-fullscreen" class="btn-close-fullscreen">
+        <span>Tutup (Esc)</span>
+      </button>
     </div>
 
     <div class="fullscreen-content">
       <div class="fullscreen-titles">
-        <h2 id="fs-title" class="fs-title">Half Heart</h2>
-        <p id="fs-title-jp" class="fs-title-jp">片ハート</p>
+        <h2 id="fs-title" class="fs-title">Dagu di Kepala &amp; Kuping Kelinci</h2>
+        <p id="fs-title-jp" class="fs-title-jp" lang="ja">頭のせピースうさ耳</p>
       </div>
 
-      <div class="fs-photo-container">
-        <div id="fs-visual" class="fs-visual"></div>
+      <div class="fs-photo-stage">
+        <button type="button" id="btn-fs-prev" class="fs-nav-btn fs-nav-prev" aria-label="Pose Sebelumnya">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+
+        <div class="fs-photo-container">
+          <div id="fs-visual" class="fs-visual"></div>
+        </div>
+
+        <button type="button" id="btn-fs-next" class="fs-nav-btn fs-nav-next" aria-label="Pose Berikutnya">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
       </div>
 
       <div class="fs-cue-box">
-        <p class="fs-cue-prompt">👉 Kak, pose ini ya:</p>
-        <h3 id="fs-cue-id" class="fs-cue-text">"Kak, bikin setengah hati ya!"</h3>
-        <p id="fs-cue-jp" class="fs-cue-jp">一緒にハート作ってください！</p>
+        <p class="fs-cue-prompt">KALIMAT KE OSHI / お願いセリフ</p>
+        <h3 id="fs-cue-id" class="fs-cue-text">"Kak, aku numpang taruh dagu di atas kepala kamu ya!"</h3>
+        <p id="fs-cue-jp" class="fs-cue-jp" lang="ja">頭にあご乗せてうさ耳ポーズさせてください！</p>
       </div>
 
       <div class="fs-stance-row">
         <div class="fs-stance-col fan">
-          <span class="fs-badge">👤 Tangan Kamu</span>
-          <p id="fs-fan-act">Bentuk setengah hati di samping</p>
+          <span class="fs-badge">POSISI KAMU (FAN)</span>
+          <p id="fs-fan-act">Berdiri di belakang, dagu menumpu di atas kepala oshi.</p>
         </div>
         <div class="fs-stance-col idol">
-          <span class="fs-badge">💖 Tangan Oshi</span>
-          <p id="fs-idol-act">Melengkapi setengah hati lainnya</p>
+          <span class="fs-badge">POSISI OSHI (IDOL)</span>
+          <p id="fs-idol-act">Duduk atau berdiri di depan, melirik ke atas.</p>
         </div>
       </div>
     </div>
