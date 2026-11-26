@@ -36,19 +36,29 @@
         </div>
       </div>
 
-      <button id="btn-toggle-sound" type="button" class="btn-sound-toggle" aria-pressed="false" title="Nyalakan atau matikan suara">
-        <svg id="icon-sound-off" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-          <line x1="23" y1="9" x2="17" y2="15"></line>
-          <line x1="17" y1="9" x2="23" y2="15"></line>
-        </svg>
-        <svg id="icon-sound-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden>
-          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
-        </svg>
-        <span id="sound-label">Suara: Mati</span>
-      </button>
+      <div class="topbar-actions">
+        <button id="btn-toggle-sound" type="button" class="btn-sound-toggle" aria-pressed="false" title="Nyalakan atau matikan suara">
+          <svg id="icon-sound-off" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <line x1="23" y1="9" x2="17" y2="15"></line>
+            <line x1="17" y1="9" x2="23" y2="15"></line>
+          </svg>
+          <svg id="icon-sound-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden>
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+          </svg>
+          <span id="sound-label">Suara: Mati</span>
+        </button>
+
+        <button id="btn-open-settings" type="button" class="btn-settings-trigger" aria-haspopup="dialog" aria-controls="modal-settings" title="Pengaturan Gacha &amp; Riwayat">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span class="sr-only">Pengaturan</span>
+        </button>
+      </div>
     </header>
 
     <nav class="mode-selector" aria-label="Pilih Mode Pose">
@@ -77,10 +87,11 @@
           <span id="sop-badge-label" class="badge-sop sop-safe">SOP: Aman (Tanpa Sentuh)</span>
         </div>
 
-        <div class="viewfinder-box" id="viewfinder-box" role="button" tabindex="0" title="Ketuk untuk perbesar (Layar Penuh ke Oshi)">
+        <div class="viewfinder-box is-standby" id="viewfinder-box" role="button" tabindex="0" title="Putar gacha untuk memilih pose">
           <div id="flash-overlay" class="flash-overlay" aria-hidden="true"></div>
+          <span id="roll-round-badge" class="roll-round-badge" hidden>RONDE 1 / 3</span>
           <div id="photo-render-area" class="photo-render-area"></div>
-          <button type="button" id="btn-fullscreen-trigger" class="btn-fs-pill" title="Tunjukkan Layar Penuh ke Oshi">
+          <button type="button" id="btn-fullscreen-trigger" class="btn-fs-pill" title="Tunjukkan Layar Penuh ke Oshi" hidden>
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polyline points="15 3 21 3 21 9"></polyline>
               <polyline points="9 21 3 21 3 15"></polyline>
@@ -104,13 +115,25 @@
             <circle cx="15.5" cy="15.5" r="1.3" fill="currentColor"></circle>
           </svg>
           <span class="spin-label">
-            <span>PUTAR GACHA POSE!</span>
-            <span aria-hidden="true">PUTAR GACHA POSE!</span>
+            <span id="spin-label-primary">PUTAR GACHA POSE!</span>
+            <span id="spin-label-hover" aria-hidden="true">PUTAR GACHA POSE!</span>
           </span>
         </button>
       </div>
 
-      <div class="pose-info-box">
+      <div id="pose-standby-info" class="pose-standby-info">
+        <p class="standby-info-kicker" id="standby-info-kicker">STANDBY // CUTE MODE</p>
+        <h2 class="standby-info-title" id="standby-info-title">Siap Mengundi Pose Cheki</h2>
+        <p class="standby-info-desc" id="standby-info-desc">
+          Tekan tombol <strong>PUTAR GACHA POSE!</strong> di bawah foto untuk mengacak pose. Detail pose, cue dialog, dan posisi akan muncul setelah gacha berhenti.
+        </p>
+        <div class="standby-info-meta">
+          <span id="standby-meta-pool" class="standby-pill">14 / 14 pose tersedia</span>
+          <span id="standby-meta-roll" class="standby-pill">Roll: Normal · 1x</span>
+        </div>
+      </div>
+
+      <div id="pose-info-box" class="pose-info-box" hidden>
         <div class="pose-titles-wrap">
           <h2 id="pose-title" class="pose-title">Dagu di Kepala &amp; Kuping Kelinci</h2>
           <p class="pose-jp-subtitle">
@@ -150,13 +173,22 @@
           </div>
         </div>
 
-        <button type="button" id="btn-show-oshi-bottom" class="btn-show-oshi">
-          <span>Tunjukkan Layar Penuh ke Oshi</span>
-          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="7" y1="17" x2="17" y2="7"></line>
-            <polyline points="7 7 17 7 17 17"></polyline>
-          </svg>
-        </button>
+        <div class="pose-action-row">
+          <button type="button" id="btn-mark-used" class="btn-mark-used" aria-pressed="false">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span id="mark-used-label">Tandai Sudah Diposekan</span>
+          </button>
+
+          <button type="button" id="btn-show-oshi-bottom" class="btn-show-oshi">
+            <span>Tunjukkan Layar Penuh ke Oshi</span>
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="7" y1="17" x2="17" y2="7"></line>
+              <polyline points="7 7 17 7 17 17"></polyline>
+            </svg>
+          </button>
+        </div>
       </div>
     </main>
   </div>
@@ -164,9 +196,14 @@
   <div id="modal-show-idol" class="modal-fullscreen" role="dialog" aria-modal="true" aria-labelledby="fs-title" hidden>
     <div class="fullscreen-topbar">
       <span id="fs-mode-tag" class="fullscreen-tag">TUNJUKKAN KE OSHI</span>
-      <button type="button" id="btn-close-fullscreen" class="btn-close-fullscreen">
-        <span>Tutup (Esc)</span>
-      </button>
+      <div class="fs-topbar-actions">
+        <button type="button" id="btn-fs-mark-used" class="btn-fs-mark-used" aria-pressed="false">
+          <span id="fs-mark-used-label">Tandai Dipakai</span>
+        </button>
+        <button type="button" id="btn-close-fullscreen" class="btn-close-fullscreen">
+          <span>Tutup (Esc)</span>
+        </button>
+      </div>
     </div>
 
     <div class="fullscreen-body">
@@ -194,6 +231,108 @@
           <span class="fs-pill">POSISI OSHI (IDOL)</span>
           <p id="fs-idol-act">Duduk atau berdiri di depan, melirik ke atas.</p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-settings" class="modal-settings-backdrop" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+    <div class="settings-sheet" role="document">
+      <div class="settings-header">
+        <div>
+          <p class="settings-kicker">PENGATURAN GACHA</p>
+          <h2 id="settings-title" class="settings-title">Kontrol Roulette &amp; Riwayat</h2>
+        </div>
+        <button type="button" id="btn-close-settings" class="btn-close-settings" aria-label="Tutup Pengaturan">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="settings-body">
+        <section class="settings-group">
+          <div class="settings-group-head">
+            <h3 class="settings-label">Durasi Putaran</h3>
+            <span class="settings-hint">Lama suspense tiap ronde</span>
+          </div>
+          <div class="segmented-control cols-4" role="group" aria-label="Durasi Putaran">
+            <button type="button" class="setting-opt-btn" data-setting="duration" data-value="fast" aria-pressed="false">
+              <span>Cepat</span>
+              <small>~1.2 dtk</small>
+            </button>
+            <button type="button" class="setting-opt-btn active" data-setting="duration" data-value="normal" aria-pressed="true">
+              <span>Normal</span>
+              <small>~2.6 dtk</small>
+            </button>
+            <button type="button" class="setting-opt-btn" data-setting="duration" data-value="dramatic" aria-pressed="false">
+              <span>Dramatis</span>
+              <small>~4.5 dtk</small>
+            </button>
+            <button type="button" class="setting-opt-btn" data-setting="duration" data-value="custom" aria-pressed="false">
+              <span>Custom</span>
+              <small>≤10 dtk</small>
+            </button>
+          </div>
+          <div id="custom-duration-row" class="custom-duration-row" hidden>
+            <div class="custom-duration-head">
+              <label for="input-custom-duration" class="custom-duration-label">Atur Durasi Custom (0.5 – 10 dtk)</label>
+              <span id="custom-duration-value" class="custom-duration-val">5.0 dtk</span>
+            </div>
+            <input type="range" id="input-custom-duration" class="custom-duration-slider" min="0.5" max="10" step="0.5" value="5">
+          </div>
+        </section>
+
+        <section class="settings-group">
+          <div class="settings-group-head">
+            <h3 class="settings-label">Jumlah Roll per Klik</h3>
+            <span class="settings-hint">Efek fake-out sebelum kunci</span>
+          </div>
+          <div class="segmented-control cols-4" role="group" aria-label="Jumlah Roll per Klik">
+            <button type="button" class="setting-opt-btn active" data-setting="rollCount" data-value="1" aria-pressed="true">
+              <span>1x</span>
+              <small>Langsung</small>
+            </button>
+            <button type="button" class="setting-opt-btn" data-setting="rollCount" data-value="2" aria-pressed="false">
+              <span>2x</span>
+              <small>1 Fake-out</small>
+            </button>
+            <button type="button" class="setting-opt-btn" data-setting="rollCount" data-value="3" aria-pressed="false">
+              <span>3x</span>
+              <small>2 Fake-out</small>
+            </button>
+            <button type="button" class="setting-opt-btn" data-setting="rollCount" data-value="random" aria-pressed="false">
+              <span>Acak</span>
+              <small>1–3x</small>
+            </button>
+          </div>
+        </section>
+
+        <section class="settings-group">
+          <div class="settings-group-head">
+            <h3 class="settings-label">Riwayat Pose Terpakai</h3>
+            <span class="settings-hint">Tersimpan di browser ini</span>
+          </div>
+
+          <label class="toggle-row" for="toggle-auto-mark">
+            <span class="toggle-copy">
+              <strong>Otomatis tandai setelah roll</strong>
+              <small>Pose terpilih langsung disembunyikan dari gacha berikutnya</small>
+            </span>
+            <input type="checkbox" id="toggle-auto-mark" class="toggle-input">
+            <span class="toggle-track" aria-hidden="true"></span>
+          </label>
+
+          <div class="cache-stats-box">
+            <p id="settings-used-summary" class="cache-stat-main">Terpakai: 0 / 41 pose</p>
+            <p id="settings-mode-summary" class="cache-stat-sub">Mode aktif (Cute): 14 / 14 tersedia</p>
+          </div>
+
+          <div class="reset-actions-row">
+            <button type="button" id="btn-reset-mode-used" class="btn-reset-outline">Reset Mode Aktif</button>
+            <button type="button" id="btn-reset-all-used" class="btn-reset-danger">Reset Semua Riwayat</button>
+          </div>
+        </section>
       </div>
     </div>
   </div>

@@ -64,6 +64,26 @@ class SoundEffects {
     } catch (e) {}
   }
 
+  playFakeStop() {
+    if (!this.enabled) return;
+    try {
+      this.init();
+      const now = this.ctx.currentTime;
+      [340, 260].forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+        gain.gain.setValueAtTime(0.14, now + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.005, now + idx * 0.08 + 0.09);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now + idx * 0.08);
+        osc.stop(now + idx * 0.08 + 0.09);
+      });
+    } catch (e) {}
+  }
+
   playLock() {
     if (!this.enabled) return;
     try {
