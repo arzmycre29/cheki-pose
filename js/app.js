@@ -1,6 +1,6 @@
-import { CHEKI_POSES, MODE_INFO } from "./poses-data.js?v=20261126b";
-import { renderPoseDiagram } from "./diagrams.js?v=20261126b";
-import { sfx } from "./audio.js?v=20261126b";
+import { CHEKI_POSES, MODE_INFO } from "./poses-data.js?v=20261126c";
+import { renderPoseDiagram } from "./diagrams.js?v=20261126c";
+import { sfx } from "./audio.js?v=20261126c";
 
 const SETTINGS_STORAGE_KEY = "chekipose_settings";
 const USED_POSES_STORAGE_KEY = "chekipose_used_poses";
@@ -523,17 +523,24 @@ class ChekiPoseApp {
     this.isRolling = true;
 
     const btnRoll = document.getElementById("btn-roll-gacha");
-    const card = document.getElementById("polaroid-card");
+    const cardInner = document.getElementById("polaroid-card-inner");
     const viewfinder = document.getElementById("viewfinder-box");
     const roundBadge = document.getElementById("roll-round-badge");
     const fsPill = document.getElementById("btn-fullscreen-trigger");
 
     if (btnRoll) btnRoll.disabled = true;
-    if (card) card.classList.add("is-spinning");
+    if (cardInner) {
+      cardInner.classList.remove("lock-celebrate", "is-fakeout-brake");
+      cardInner.classList.add("is-spinning");
+      cardInner.style.transition = "none";
+      cardInner.style.transform = "rotateY(0deg)";
+      void cardInner.offsetWidth;
+    }
     if (viewfinder) viewfinder.classList.remove("is-standby");
     if (fsPill) fsPill.hidden = true;
 
     let currentRound = 1;
+    let currentAngle = 0;
     let lastCandidateId = this.selectedPose ? this.selectedPose.id : null;
 
     const runRound = () => {
@@ -567,40 +574,68 @@ class ChekiPoseApp {
 
       const executeStep = () => {
         if (stepIndex < delays.length) {
-          let candidate =
-            visualPool[Math.floor(Math.random() * visualPool.length)];
-          if (visualPool.length > 1 && candidate.id === lastCandidateId) {
-            candidate =
-              visualPool.find((p) => p.id !== lastCandidateId) || candidate;
-          }
-          lastCandidateId = candidate.id;
+          const currentDelay = delays[stepIndex];
+          const isLastStepOfRound = stepIndex === delays.length - 1;
+          const isSlowPhase = stepIndex >= delays.length - 3;
 
-          this.renderVisual(
-            candidate,
-            document.getElementById("photo-render-area")
-          );
+          let nextPose;
+          if (isLastStepOfRound && isFinalRound) {
+            nextPose = finalPick;
+          } else if (isLastStepOfRound && !isFinalRound) {
+            nextPose =
+              visualPool[Math.floor(Math.random() * visualPool.length)];
+            if (visualPool.length > 1 && nextPose.id === finalPick.id) {
+              nextPose =
+                visualPool.find((p) => p.id !== finalPick.id) || nextPose;
+            }
+          } else {
+            nextPose =
+              visualPool[Math.floor(Math.random() * visualPool.length)];
+            if (visualPool.length > 1 && nextPose.id === lastCandidateId) {
+              nextPose =
+                visualPool.find((p) => p.id !== lastCandidateId) || nextPose;
+            }
+          }
+          lastCandidateId = nextPose.id;
+
+          // Spin 360deg on Y-axis per step; swap photo right when backplate faces viewer (~45%)
+          currentAngle += 360;
+          const tiltX = isLastStepOfRound ? 0 : stepIndex % 2 === 0 ? 4 : -4;
+          const scale = isLastStepOfRound ? 1 : 0.96;
+          const easing = isLastStepOfRound
+            ? "cubic-bezier(0.22, 1, 0.36, 1)"
+            : isSlowPhase
+            ? "cubic-bezier(0.25, 0.8, 0.25, 1)"
+            : "linear";
+
+          if (cardInner) {
+            cardInner.style.transition = `transform ${currentDelay}ms ${easing}`;
+            cardInner.style.transform = `rotateY(${currentAngle}deg) rotateX(${tiltX}deg) scale(${scale})`;
+          }
+
+          const swapDelay = Math.max(20, Math.round(currentDelay * 0.42));
+          setTimeout(() => {
+            this.renderVisual(
+              nextPose,
+              document.getElementById("photo-render-area")
+            );
+          }, swapDelay);
 
           const pitch = Math.max(280, 580 - stepIndex * 14);
           sfx.playTick(pitch);
 
-          const currentDelay = delays[stepIndex];
           stepIndex++;
           setTimeout(executeStep, currentDelay);
         } else if (!isFinalRound) {
-          // Intermediate fake-out stop!
-          let fakePose =
-            visualPool[Math.floor(Math.random() * visualPool.length)];
-          if (visualPool.length > 1 && fakePose.id === finalPick.id) {
-            fakePose =
-              visualPool.find((p) => p.id !== finalPick.id) || fakePose;
+          // Intermediate fake-out brake!
+          if (cardInner) {
+            cardInner.classList.remove("is-spinning");
+            cardInner.style.transition = "none";
+            cardInner.style.transform = "rotateY(0deg)";
+            void cardInner.offsetWidth;
+            currentAngle = 0;
+            cardInner.classList.add("is-fakeout-brake");
           }
-          lastCandidateId = fakePose.id;
-          this.renderVisual(
-            fakePose,
-            document.getElementById("photo-render-area")
-          );
-
-          if (card) card.classList.remove("is-spinning");
           sfx.playFakeStop();
 
           if (roundBadge) {
@@ -610,12 +645,20 @@ class ChekiPoseApp {
 
           setTimeout(() => {
             currentRound++;
-            if (card) card.classList.add("is-spinning");
+            if (cardInner) {
+              cardInner.classList.remove("is-fakeout-brake");
+              cardInner.classList.add("is-spinning");
+            }
             runRound();
-          }, 620);
+          }, 640);
         } else {
           // Final jackpot lock
-          if (card) card.classList.remove("is-spinning");
+          if (cardInner) {
+            cardInner.classList.remove("is-spinning");
+            cardInner.style.transition = "none";
+            cardInner.style.transform = "rotateY(0deg)";
+            void cardInner.offsetWidth;
+          }
           if (roundBadge) {
             roundBadge.hidden = true;
             roundBadge.classList.remove("is-fakeout");
@@ -632,7 +675,8 @@ class ChekiPoseApp {
 
   finishRollLock(finalPick) {
     const flashEl = document.getElementById("flash-overlay");
-    const card = document.getElementById("polaroid-card");
+    const cardInner = document.getElementById("polaroid-card-inner");
+    const sheenEl = document.getElementById("card-sheen");
     const btnRoll = document.getElementById("btn-roll-gacha");
 
     this.displayPose(finalPick, true);
@@ -650,9 +694,16 @@ class ChekiPoseApp {
       setTimeout(() => flashEl.classList.remove("active"), 280);
     }
 
-    if (card) {
-      card.classList.add("lock-celebrate");
-      setTimeout(() => card.classList.remove("lock-celebrate"), 450);
+    if (sheenEl) {
+      sheenEl.classList.remove("active");
+      void sheenEl.offsetWidth;
+      sheenEl.classList.add("active");
+      setTimeout(() => sheenEl.classList.remove("active"), 700);
+    }
+
+    if (cardInner) {
+      cardInner.classList.add("lock-celebrate");
+      setTimeout(() => cardInner.classList.remove("lock-celebrate"), 500);
     }
 
     this.isRolling = false;

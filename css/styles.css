@@ -279,37 +279,175 @@ body {
   gap: 12px;
 }
 
-/* Photo Card */
+/* 3D Card Spin Stage */
+.card-3d-stage {
+  perspective: 1150px;
+  width: 100%;
+}
+
+.card-3d-inner {
+  position: relative;
+  width: 100%;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card-face {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Photo Card (Front Face) */
 .photo-card {
+  position: relative;
+  overflow: hidden;
   background: var(--surface-film);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-md);
   padding: 10px 10px 12px;
-  box-shadow: 0 8px 24px -8px rgba(17, 17, 19, 0.1);
+  box-shadow: 0 8px 24px -8px rgba(17, 17, 19, 0.12);
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: transform 0.2s var(--ease-soft), box-shadow 0.2s var(--ease-soft);
+  transition: box-shadow 0.25s var(--ease-soft);
 }
 
-.photo-card.is-spinning {
-  animation: rouletteVibrate 0.08s infinite alternate ease-in-out;
-  box-shadow: 0 0 0 2px var(--accent), 0 10px 28px -6px rgba(17, 17, 19, 0.18);
+.card-3d-inner.is-spinning .photo-card {
+  box-shadow: 0 0 0 2px var(--accent), 0 18px 36px -8px rgba(17, 17, 19, 0.28);
 }
 
-@keyframes rouletteVibrate {
-  0% { transform: scale(0.992) rotate(-0.25deg); }
-  100% { transform: scale(1.008) rotate(0.25deg); }
+.card-3d-inner.is-fakeout-brake {
+  animation: fakeoutBrake 0.36s var(--ease-out);
 }
 
-.photo-card.lock-celebrate {
-  animation: cardLockBounce 0.45s var(--ease-out);
+@keyframes fakeoutBrake {
+  0% { transform: rotateY(0deg) scale(1); }
+  35% { transform: rotateY(-14deg) scale(1.02); }
+  70% { transform: rotateY(7deg) scale(0.99); }
+  100% { transform: rotateY(0deg) scale(1); }
+}
+
+.card-3d-inner.lock-celebrate {
+  animation: cardLockBounce 0.48s var(--ease-out);
 }
 
 @keyframes cardLockBounce {
-  0% { transform: scale(0.95); }
-  50% { transform: scale(1.025); }
-  100% { transform: scale(1); }
+  0% { transform: scale(0.94) translateY(4px); }
+  48% { transform: scale(1.03) translateY(-4px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+/* Glossy Sheen Sweep on Final Lock */
+.card-sheen-sweep {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.45) 45%,
+    rgba(255, 255, 255, 0.72) 50%,
+    rgba(255, 255, 255, 0.2) 56%,
+    transparent 75%
+  );
+  transform: translateX(-140%);
+  opacity: 0;
+}
+
+.card-sheen-sweep.active {
+  animation: sheenSweep 0.65s var(--ease-out) forwards;
+}
+
+@keyframes sheenSweep {
+  0% { transform: translateX(-140%); opacity: 0.9; }
+  100% { transform: translateX(140%); opacity: 0; }
+}
+
+/* Instax Backplate (Back Face of 3D Card) */
+.card-face-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.025) 0px,
+      rgba(255, 255, 255, 0.025) 6px,
+      transparent 6px,
+      transparent 14px
+    ),
+    linear-gradient(155deg, #1A1A1F 0%, #0E0E11 100%);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.45);
+}
+
+.backplate-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #FAFAFA;
+}
+
+.backplate-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-color: var(--accent);
+  border-style: solid;
+}
+
+.backplate-corner.top-left { top: 10px; left: 10px; border-width: 2px 0 0 2px; }
+.backplate-corner.top-right { top: 10px; right: 10px; border-width: 2px 2px 0 0; }
+.backplate-corner.bottom-left { bottom: 10px; left: 10px; border-width: 0 0 2px 2px; }
+.backplate-corner.bottom-right { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; }
+
+.backplate-emblem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #FFFFFF;
+}
+
+.backplate-emblem svg {
+  color: var(--accent);
+}
+
+.backplate-brand {
+  font-family: var(--f-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.backplate-jp {
+  font-family: var(--f-jp);
+  font-size: 0.85rem;
+  color: #FFFFFF;
+  background: var(--accent);
+  padding: 2px 10px;
+  border-radius: var(--radius-xs);
+}
+
+.backplate-serial {
+  position: absolute;
+  bottom: 14px;
+  font-family: var(--f-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #A1A1AA;
 }
 
 .card-meta-top {
@@ -920,7 +1058,7 @@ body {
     align-items: start;
   }
 
-  .photo-card {
+  .card-3d-stage {
     grid-area: photo;
   }
 

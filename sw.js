@@ -1,15 +1,15 @@
-const CACHE_NAME = "chekipose-offline-v2-20261126";
+const CACHE_NAME = "chekipose-offline-v3-20261126c";
 const FONT_CACHE_NAME = "chekipose-fonts-v1";
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./css/styles.css?v=20261126b",
-  "./js/app.js?v=20261126b",
-  "./js/poses-data.js?v=20261126b",
-  "./js/audio.js?v=20261126b",
-  "./js/diagrams.js?v=20261126b",
+  "./css/styles.css?v=20261126c",
+  "./js/app.js?v=20261126c",
+  "./js/poses-data.js?v=20261126c",
+  "./js/audio.js?v=20261126c",
+  "./js/diagrams.js?v=20261126c",
   "./assets/icons/icon.svg",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png"
