@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700&amp;family=Mochiy+Pop+One&amp;family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=Syne:wght@700;800&amp;display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/styles.css?v=20261126">
+  <link rel="stylesheet" href="css/styles.css?v=20261126b">
 </head>
 <body data-mode="cute">
   <a class="skip-link" href="#btn-roll-gacha">Langsung ke tombol putar gacha</a>
@@ -333,10 +333,24 @@
             <button type="button" id="btn-reset-all-used" class="btn-reset-danger">Reset Semua Riwayat</button>
           </div>
         </section>
+
+        <section class="settings-group">
+          <div class="settings-group-head">
+            <h3 class="settings-label">Mode Offline (PWA)</h3>
+            <span class="settings-hint">Tanpa sinyal di venue</span>
+          </div>
+          <div class="offline-box">
+            <div class="offline-status-row">
+              <span id="offline-status-dot" class="offline-dot" aria-hidden="true"></span>
+              <span id="offline-status-text" class="offline-status-text">Memeriksa cache offline...</span>
+            </div>
+            <button type="button" id="btn-refresh-offline-cache" class="btn-offline-sync">Simpan Semua Foto Offline</button>
+          </div>
+        </section>
       </div>
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=20261126"></script>
+  <script type="module" src="js/app.js?v=20261126b"></script>
 </body>
 </html>

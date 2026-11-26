@@ -1561,6 +1561,65 @@ body {
   cursor: not-allowed;
 }
 
+/* Offline PWA Status Box */
+.offline-box {
+  background: var(--ground);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.offline-status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.offline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #A1A1AA;
+  flex-shrink: 0;
+}
+
+.offline-dot.is-ready {
+  background: #16A34A;
+}
+
+.offline-dot.is-offline {
+  background: #D97706;
+}
+
+.offline-status-text {
+  font-family: var(--f-mono);
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.btn-offline-sync {
+  min-height: 44px;
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--surface-film);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  font-family: var(--f-text);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-offline-sync:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

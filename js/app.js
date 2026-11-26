@@ -1,6 +1,6 @@
-import { CHEKI_POSES, MODE_INFO } from "./poses-data.js?v=20261126";
-import { renderPoseDiagram } from "./diagrams.js?v=20261126";
-import { sfx } from "./audio.js?v=20261126";
+import { CHEKI_POSES, MODE_INFO } from "./poses-data.js?v=20261126b";
+import { renderPoseDiagram } from "./diagrams.js?v=20261126b";
+import { sfx } from "./audio.js?v=20261126b";
 
 const SETTINGS_STORAGE_KEY = "chekipose_settings";
 const USED_POSES_STORAGE_KEY = "chekipose_used_poses";
@@ -47,6 +47,117 @@ class ChekiPoseApp {
     this.bindEvents();
     this.preloadAllImages();
     this.displayStandby(this.currentMode);
+    this.registerServiceWorker();
+  }
+
+  /* ── Offline PWA Service Worker ───────────────────────────────────── */
+
+  async registerServiceWorker() {
+    if (!("serviceWorker" in navigator)) {
+      this.setOfflineStatus("Browser tidak mendukung mode offline", "idle");
+      return;
+    }
+    try {
+      const reg = await navigator.serviceWorker.register("./sw.js");
+      if (reg.installing) {
+        this.setOfflineStatus("Mengunduh foto untuk mode offline...", "idle");
+        reg.installing.addEventListener("statechange", (e) => {
+          if (e.target.state === "activated") {
+            this.updateOfflineStatus();
+          }
+        });
+      }
+      await navigator.serviceWorker.ready;
+      this.updateOfflineStatus();
+    } catch (e) {
+      this.setOfflineStatus("Gagal mengaktifkan mode offline", "idle");
+    }
+  }
+
+  setOfflineStatus(text, state = "idle") {
+    const dot = document.getElementById("offline-status-dot");
+    const lbl = document.getElementById("offline-status-text");
+    if (lbl) lbl.textContent = text;
+    if (dot) {
+      dot.classList.remove("is-ready", "is-offline");
+      if (state === "ready") dot.classList.add("is-ready");
+      if (state === "offline") dot.classList.add("is-offline");
+    }
+  }
+
+  async updateOfflineStatus() {
+    if (!("caches" in window)) {
+      this.setOfflineStatus("Cache offline tidak tersedia", "idle");
+      return;
+    }
+    try {
+      const keys = await caches.keys();
+      const targetKey = keys.find((k) => k.startsWith("chekipose-offline-"));
+      let cachedCount = 0;
+      const totalPhotos = CHEKI_POSES.length;
+      if (targetKey) {
+        const cache = await caches.open(targetKey);
+        const reqs = await cache.keys();
+        const cachedPaths = new Set(reqs.map((r) => new URL(r.url).pathname));
+        cachedCount = CHEKI_POSES.filter((p) => {
+          const expected = new URL(p.image, window.location.href).pathname;
+          return cachedPaths.has(expected);
+        }).length;
+      }
+
+      const isOffline = !navigator.onLine;
+      if (cachedCount >= totalPhotos) {
+        this.setOfflineStatus(
+          isOffline
+            ? `Sedang Offline · ${cachedCount}/${totalPhotos} foto siap`
+            : `Siap Offline · ${cachedCount}/${totalPhotos} foto tersimpan`,
+          isOffline ? "offline" : "ready"
+        );
+      } else {
+        this.setOfflineStatus(
+          `Tersimpan ${cachedCount}/${totalPhotos} foto (ketuk tombol di bawah)`,
+          "idle"
+        );
+      }
+    } catch (e) {
+      this.setOfflineStatus("Status offline tidak dapat dibaca", "idle");
+    }
+  }
+
+  async cacheAllPosesNow() {
+    const btn = document.getElementById("btn-refresh-offline-cache");
+    if (!("caches" in window)) return;
+    if (!navigator.onLine) {
+      this.setOfflineStatus("Tidak ada sinyal untuk mengunduh cache baru", "offline");
+      return;
+    }
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Menyimpan 41 foto...";
+    }
+    try {
+      const keys = await caches.keys();
+      const cacheName =
+        keys.find((k) => k.startsWith("chekipose-offline-")) ||
+        "chekipose-offline-v2-20261126";
+      const cache = await caches.open(cacheName);
+      let done = 0;
+      await Promise.allSettled(
+        CHEKI_POSES.map(async (p) => {
+          await cache.add(p.image);
+          done++;
+          if (btn) {
+            btn.textContent = `Menyimpan foto (${done}/${CHEKI_POSES.length})...`;
+          }
+        })
+      );
+      sfx.playTick(620);
+    } catch (e) {}
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Simpan Semua Foto Offline";
+    }
+    await this.updateOfflineStatus();
   }
 
   /* ── LocalStorage Persistence ─────────────────────────────────────── */
@@ -748,6 +859,7 @@ class ChekiPoseApp {
     if (!modal) return;
     this.syncSettingsUI();
     this.syncSettingsStats();
+    this.updateOfflineStatus();
     modal.hidden = false;
     document.body.style.overflow = "hidden";
     sfx.playTick(480);
@@ -1099,6 +1211,14 @@ class ChekiPoseApp {
     if (btnResetAll) {
       btnResetAll.addEventListener("click", () => this.resetUsedPoses("all"));
     }
+
+    const btnOfflineSync = document.getElementById("btn-refresh-offline-cache");
+    if (btnOfflineSync) {
+      btnOfflineSync.addEventListener("click", () => this.cacheAllPosesNow());
+    }
+
+    window.addEventListener("online", () => this.updateOfflineStatus());
+    window.addEventListener("offline", () => this.updateOfflineStatus());
 
     window.addEventListener("keydown", (e) => {
       if (

@@ -1,6 +1,8 @@
 {
   "name": "ChekiPose: Katalog & Penentu Pose Cheki Idol",
   "short_name": "ChekiPose",
+  "id": "./",
+  "scope": "./",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#F4F1EA",
