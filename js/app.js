@@ -1,6 +1,6 @@
-import { CHEKI_POSES, MODE_INFO } from "./poses-data.js";
-import { renderPoseDiagram } from "./diagrams.js";
-import { sfx } from "./audio.js";
+import { CHEKI_POSES, MODE_INFO } from "./poses-data.js?v=20261126";
+import { renderPoseDiagram } from "./diagrams.js?v=20261126";
+import { sfx } from "./audio.js?v=20261126";
 
 const SETTINGS_STORAGE_KEY = "chekipose_settings";
 const USED_POSES_STORAGE_KEY = "chekipose_used_poses";
